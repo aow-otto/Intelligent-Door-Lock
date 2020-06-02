@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">智能门锁</string>
+    <string name="action_settings">设置</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="off">OFF</string>
+    <string name="on">ON</string>
+    <string name="togglebutton">ToggleButton</string>
+    <string name="refresh">刷新</string>
+    <string name="help">帮助</string>
+    <string name="zhunbeipeidui">正在准备配对……</string>
+    <string name="qianwgnlanya">前往蓝牙配置界面</string>
+</resources>

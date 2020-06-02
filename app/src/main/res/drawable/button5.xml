@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false"><!--没点击按钮的时候-->
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <corners android:radius="30dp" />
+
+            <gradient android:centerColor="#B3118D9E" android:endColor="#B374A2A8" android:startColor="#B374A2A8" />
+
+        </shape>
+    </item>
+
+    <item android:state_pressed="true"><!--点击按钮的时候-->
+        <shape>
+            <corners android:radius="30dp" />
+            <gradient android:centerColor="#118D9E" android:endColor="#74A2A8" android:startColor="#74A2A8" />
+        </shape>
+    </item>
+</selector>

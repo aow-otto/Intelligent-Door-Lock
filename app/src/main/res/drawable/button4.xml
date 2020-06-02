@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false"><!--没点击按钮的时候-->
+        <shape>
+            <corners android:radius="30dp" />
+            <gradient android:centerColor="#B320AA27" android:endColor="#B365AC68" android:startColor="#B365AC68" />
+        </shape>
+    </item>
+
+    <item android:state_pressed="true"><!--点击按钮的时候-->
+        <shape>
+            <corners android:radius="30dp" />
+            <gradient android:centerColor="#20AA27" android:endColor="#65AC68" android:startColor="#65AC68" />
+        </shape>
+    </item>
+</selector>

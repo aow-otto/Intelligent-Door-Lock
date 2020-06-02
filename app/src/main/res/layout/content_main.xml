@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
+
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="fill_parent"
+                android:layout_height="104dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginRight="0dp"
+                android:alpha="0.8"
+                android:text="@string/togglebutton"
+                android:textOff="@string/off"
+                android:textOn="@string/on"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <fragment
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_graph" />
+
+            <Button
+                android:id="@+id/idmatch"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/idmatching"
+                android:drawableStart="@drawable/icon_user"
+                android:drawableLeft="@drawable/icon_user"
+                android:padding="15dp"
+                android:textAllCaps="false"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/rematch"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/reamtch"
+                android:drawableStart="@drawable/icon_refresh"
+                android:drawableLeft="@drawable/icon_refresh"
+                android:padding="15dp"
+                android:text="重新配对      "
+                android:textSize="20sp" />
+
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="30dp">
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal|center_vertical">
+
+                    <Button
+                        android:id="@+id/button1"
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button1"
+                        android:drawableTop="@drawable/icon_time2"
+                        android:text="定时开关机"
+                        android:textSize="20sp"
+                        android:textStyle="normal" />
+
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button2"
+                        android:drawableTop="@drawable/icon_time"
+                        android:gravity="center"
+                        android:text="时间设置"
+                        android:textSize="20sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal|center_vertical">
+
+                    <Button
+                        android:id="@+id/button3"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button3"
+                        android:drawableTop="@drawable/icon_security"
+                        android:text="安全性方案选择"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/button4"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button4"
+                        android:drawableTop="@drawable/icon_setup"
+                        android:text="舵机角度设置"
+                        android:textSize="20sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal|center_vertical">
+
+                    <Button
+                        android:id="@+id/button5"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button5"
+                        android:drawableTop="@drawable/icon_lock"
+                        android:text="开锁方向设置"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/button6"
+                        android:layout_height="160dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button6"
+                        android:drawableTop="@drawable/icon_more"
+                        android:text="更多功能"
+                        android:textSize="20sp" />
+
+                </TableRow>
+            </TableLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
