@@ -333,7 +333,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button4.setEnabled(true);
                 button5.setEnabled(true);
                 button6.setEnabled(true);
-                thread_open_close = true;
+                //注：在调试线程部分时，须将thread_open_close设为true
+                thread_open_close = false;
                 new Thread(() -> {
                     Log.d(TAG, "Having created new thread.");
                     while (thread_open_close) {
