@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        //if (Objects.equals(id_matched, "")) button2.setEnabled(false);
+        if (Objects.equals(id_matched, "")) button2.setEnabled(false);
         button2.setOnClickListener(v -> {
             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
             dialog.setMessage("请选择您需要设置的内容：");
