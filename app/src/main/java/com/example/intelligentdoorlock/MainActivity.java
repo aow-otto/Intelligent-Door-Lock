@@ -1,6 +1,7 @@
 package com.example.intelligentdoorlock;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -48,6 +50,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CommonPopWindow.ViewClickListener {
     private static final String TAG = "MainActivity";
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case UPDATE_TEXT3:
                     Toast.makeText(MainActivity.this, "读取信息流失败！", Toast.LENGTH_LONG).show();
+                    break;
                 default:
                     break;
             }
@@ -239,9 +243,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        if (Objects.equals(id_matched, "")) button2.setEnabled(false);
+        //if (Objects.equals(id_matched, "")) button2.setEnabled(false);
         button2.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "正在开发中……", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+            dialog.setMessage("请选择您需要设置的内容：");
+            dialog.setCancelable(false);
+            dialog.setNegativeButton("定时开机", (dialog1, which) -> {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+                        (view, hourOfDay, minute) -> {
+                            try {
+                                mmOutStream.write(("sys_autocontrol open " + hourOfDay + " " + minute).getBytes());
+                                ((GlobalVarious) getApplication()).setAuto_control("open " + hourOfDay + " " + minute);
+                                Toast.makeText(MainActivity.this, "定时开机设置成功！", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                            }
+                        }, 0, 0, true);
+                timePickerDialog.show();
+            });
+
+            dialog.setNeutralButton("取消", (dialog1, which) -> {
+            });
+
+            dialog.setPositiveButton("定时关机", (dialog12, which) -> {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+                        (view, hourOfDay, minute) -> {
+                            try {
+                                mmOutStream.write(("sys_autocontrol close " + hourOfDay + " " + minute).getBytes());
+                                ((GlobalVarious) getApplication()).setAuto_control("close " + hourOfDay + " " + minute);
+                                Toast.makeText(MainActivity.this, "定时关机设置成功！", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                            }
+                        }, 0, 0, true);
+                timePickerDialog.show();
+            });
+            dialog.show();
         });
 
         if (Objects.equals(id_matched, "")) button3.setEnabled(false);
