@@ -143,6 +143,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //实际情况中，应当在连接时即进行参数同步，而不需要此步工作
         //此处部分参数可看作未设置时的默认值
         ((GlobalVarious) getApplication()).setCurrent_mode("waiting");
+        ((GlobalVarious) getApplication()).setSafety_mode("1");
+
+        switch (((GlobalVarious) getApplication()).getSafety_mode()) {
+            case "0":
+                categoryName = "设备锁关闭";
+            case "1":
+                categoryName = "需要验证";
+            case "2":
+                categoryName = "设备锁开启";
+            default:
+                Log.e(TAG, "categoryName初始化失败！");
+        }
 
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("id_matched", "");
@@ -237,6 +249,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mmOutStream.write("unlock_door".getBytes());
                     ((GlobalVarious) getApplication()).setCurrent_mode("working");
                     Toast.makeText(MainActivity.this, "正在开门中！", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "正在开门中，请勿重复点击！\n" +
+                            "若机器未处在工作状态，请检查并刷新。", Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 Toast.makeText(MainActivity.this, "开门失败！\n请检查蓝牙连接后重试。", Toast.LENGTH_SHORT).show();
@@ -504,47 +519,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 // 设置数据，默认选择第一条
                 addressSelector.setData(datasBeanList);
-                addressSelector.setSelected(0);
 
                 //滚动监听
-                addressSelector.setOnSelectListener(new PickerScrollView.onSelectListener() {
-                    @Override
-                    public void onSelect(GetConfigReq.DatasBean pickers) {
-                        categoryName = pickers.getCategoryName();
-                    }
-                });
+                addressSelector.setOnSelectListener(pickers -> categoryName = pickers.getCategoryName());
 
                 //完成按钮
-                imageBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mPopupWindow.dismiss();
-                        //text.setText(categoryName);
-                        switch (categoryName) {
-                            case "设备锁关闭":
-                                safety_mode = 0;
-                                break;
-                            case "需要验证":
-                                safety_mode = 1;
-                                break;
-                            case "设备锁开启":
-                                safety_mode = 2;
-                                break;
-                            default:
-                                safety_mode = -1;
+                imageBtn.setOnClickListener(v -> {
+                    mPopupWindow.dismiss();
+                    //text.setText(categoryName);
+                    switch (categoryName) {
+                        case "设备锁关闭":
+                            safety_mode = 0;
+                            break;
+                        case "需要验证":
+                            safety_mode = 1;
+                            break;
+                        case "设备锁开启":
+                            safety_mode = 2;
+                            break;
+                        default:
+                            safety_mode = -1;
+                    }
+                    Log.d(TAG, "Having defined safety_mode of " + categoryName);
+                    if (safety_mode != -1) {
+                        try {
+                            mmOutStream.write(("set_safety_mode " + safety_mode).getBytes());
+                            ((GlobalVarious) getApplication()).setSafety_mode(String.valueOf(safety_mode));
+                            Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
                         }
-                        Log.d(TAG, "Having defined safety_mode.");
-                        if (safety_mode != -1) {
-                            try {
-                                mmOutStream.write(("set_safety_mode " + safety_mode).getBytes());
-                                ((GlobalVarious) getApplication()).setSafety_mode(String.valueOf(safety_mode));
-                                Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
                     }
                 });
                 break;
@@ -571,10 +577,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button3:
-                setAddressSelectorPopup(v);
-                break;
-        }
     }
 }
