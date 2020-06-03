@@ -105,7 +105,7 @@
                         android:background="@drawable/button2"
                         android:drawableTop="@drawable/icon_time"
                         android:gravity="center"
-                        android:text="时间设置"
+                        android:text="定时开关机"
                         android:textSize="20sp" />
                 </TableRow>
 
