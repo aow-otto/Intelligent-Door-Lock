@@ -90,8 +90,8 @@
                         android:layout_marginRight="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/button1"
-                        android:drawableTop="@drawable/icon_time2"
-                        android:text="定时开关机"
+                        android:drawableTop="@drawable/icon_unlock"
+                        android:text="一键开锁"
                         android:textSize="20sp"
                         android:textStyle="normal" />
 

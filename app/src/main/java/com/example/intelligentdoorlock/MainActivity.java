@@ -118,6 +118,11 @@ public class MainActivity extends AppCompatActivity {
         button5 = (Button) findViewById(R.id.button5);
         button6 = (Button) findViewById(R.id.button6);
 
+        //此部分代码预设各参数值，仅供同步功能实现以前调试使用
+        //实际情况中，应当在连接时即进行参数同步，而不需要此步工作
+        //此处部分参数可看作未设置时的默认值
+        ((GlobalVarious) getApplication()).setCurrent_mode("waiting");
+
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("id_matched", "");
         editor.putString("mac_address", "");
@@ -133,26 +138,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    String inputText = "match " + id_matched + "\nsys_control open\nrequest_setting_file";
-                    save(inputText);
-                    try {
-                        mmOutStream.write("sys_control open".getBytes());
-                        ((GlobalVarious) getApplication()).setOpen_close("open");
-                        Toast.makeText(MainActivity.this, "已开启！", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
-                        toggleButton.setChecked(false);
+                    //String inputText = "match " + id_matched + "\nsys_control open\nrequest_setting_file";
+                    //save(inputText);
+                    if (id_matched != null) {
+                        try {
+                            mmOutStream.write("sys_control open".getBytes());
+                            ((GlobalVarious) getApplication()).setOpen_close("open");
+                            Toast.makeText(MainActivity.this, "已开启！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
+                            toggleButton.setChecked(false);
+                        }
                     }
                 } else {
-                    String inputText = "match " + id_matched + "\nsys_control close";
-                    save(inputText);
-                    try {
-                        mmOutStream.write("sys_control close".getBytes());
-                        ((GlobalVarious) getApplication()).setOpen_close("close");
-                        Toast.makeText(MainActivity.this, "已关闭！", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
-                        toggleButton.setChecked(true);
+                    if (id_matched != null) {
+                        //String inputText = "match " + id_matched + "\nsys_control close";
+                        //save(inputText);
+                        try {
+                            mmOutStream.write("sys_control close".getBytes());
+                            ((GlobalVarious) getApplication()).setOpen_close("close");
+                            Toast.makeText(MainActivity.this, "已关闭！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
+                            toggleButton.setChecked(true);
+                        }
                     }
                 }
             }
@@ -197,6 +206,9 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 thread_open_close = false;
                                 socket.close();
+                                id_matched = "";
+                                mac_address = "";
+                                ((GlobalVarious) getApplication()).setGlobalBlueSocket(null);
                                 Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
                                 startActivityForResult(intent, 1);
                             } catch (IOException ignored) {
@@ -221,7 +233,15 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "正在开发中……", Toast.LENGTH_SHORT).show();
+                try {
+                    if (((GlobalVarious) getApplication()).getCurrent_mode().equals("waiting")) {
+                        mmOutStream.write("unlock_door".getBytes());
+                        ((GlobalVarious) getApplication()).setCurrent_mode("working");
+                        Toast.makeText(MainActivity.this, "正在开门中！", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(MainActivity.this, "开门失败！\n请检查蓝牙连接后重试。", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
