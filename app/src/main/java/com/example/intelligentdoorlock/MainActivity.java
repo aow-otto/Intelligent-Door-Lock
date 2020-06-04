@@ -291,15 +291,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (Objects.equals(id_matched, "")) button2.setEnabled(false);
         button2.setOnClickListener(v -> {
+
             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-            dialog.setMessage("请选择您需要设置的内容：");
+            dialog.setTitle("请选择您需要设置的内容：");
+            dialog.setMessage("提示：若需要取消定时开关机，请前往更多功能——取消定时开关机。");
             dialog.setCancelable(false);
             dialog.setNegativeButton("定时开机", (dialog1, which) -> {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
                         (view, hourOfDay, minute) -> {
                             try {
                                 mmOutStream.write(("sys_autocontrol open " + hourOfDay + " " + minute).getBytes());
-                                ((GlobalVarious) getApplication()).setAuto_control("open " + hourOfDay + " " + minute);
+                                ((GlobalVarious) getApplication()).setAuto_control_open(hourOfDay + " " + minute);
                                 Toast.makeText(MainActivity.this, "定时开机设置成功！", Toast.LENGTH_SHORT).show();
                             } catch (IOException e) {
                                 Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
@@ -316,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         (view, hourOfDay, minute) -> {
                             try {
                                 mmOutStream.write(("sys_autocontrol close " + hourOfDay + " " + minute).getBytes());
-                                ((GlobalVarious) getApplication()).setAuto_control("close " + hourOfDay + " " + minute);
+                                ((GlobalVarious) getApplication()).setAuto_control_close(hourOfDay + " " + minute);
                                 Toast.makeText(MainActivity.this, "定时关机设置成功！", Toast.LENGTH_SHORT).show();
                             } catch (IOException e) {
                                 Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
@@ -342,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (Integer.parseInt(inputServer.getText().toString()) >= 0 && Integer.parseInt(inputServer.getText().toString()) <= 90) {
                     try {
                         mmOutStream.write(("set_steer_angle " + inputServer.getText().toString()).getBytes());
-                        ((GlobalVarious) getApplication()).setAuto_control(inputServer.getText().toString());
+                        ((GlobalVarious) getApplication()).setSteer_angle(inputServer.getText().toString());
                         Toast.makeText(MainActivity.this, "舵机角度设置成功！", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         Toast.makeText(MainActivity.this, "传输失败，请重试！", Toast.LENGTH_SHORT).show();
@@ -357,9 +359,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Objects.equals(id_matched, "")) button5.setEnabled(false);
         button5.setOnClickListener(this::setAddressSelectorPopup2);
 
-        if (Objects.equals(id_matched, "")) button6.setEnabled(false);
+        //if (Objects.equals(id_matched, "")) button6.setEnabled(false);
         button6.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "正在开发中……", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, MoreFunctionsActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -664,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d(TAG, "Having defined unlock_direction of " + categoryName2);
                     if (unlock_direction != -1) {
                         try {
-                            mmOutStream.write(("set_safety_mode " + unlock_direction).getBytes());
+                            mmOutStream.write(("set_unlock_direction " + unlock_direction).getBytes());
                             ((GlobalVarious) getApplication()).setSafety_mode(String.valueOf(unlock_direction));
                             Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {

@@ -5,15 +5,16 @@ import android.bluetooth.BluetoothSocket;
 
 public class GlobalVarious extends Application {
     private BluetoothSocket globalBlueSocket = null;
-    private String open_close = null;
-    private String time_set = null;
-    private String auto_control = null;
-    private String safety_mode = null;
-    private String steer_angle = null;
-    private String unlock_direction = null;
-    private String indicator_light_mode = null;
-    private String battery = null;
-    private String current_mode = null;
+    private String open_close = "";
+    private String time_set = "";
+    private String auto_control_open = "";
+    private String auto_control_close = "";
+    private String safety_mode = "";
+    private String steer_angle = "";
+    private String unlock_direction = "";
+    private String indicator_light_mode = "";
+    private String battery = "";
+    private String current_mode = "";
 
     public void setGlobalBlueSocket(BluetoothSocket globalBlueSocket) {
         this.globalBlueSocket = globalBlueSocket;
@@ -39,12 +40,20 @@ public class GlobalVarious extends Application {
         return time_set;
     }
 
-    public void setAuto_control(String string) {
-        this.auto_control = string;
+    public void setAuto_control_open(String string) {
+        this.auto_control_open = string;
     }
 
-    public String getAuto_control() {
-        return auto_control;
+    public String getAuto_control_open() {
+        return auto_control_open;
+    }
+
+    public void setAuto_control_close(String string) {
+        this.auto_control_close = string;
+    }
+
+    public String getAuto_control_close() {
+        return auto_control_close;
     }
 
     public void setSafety_mode(String string) {

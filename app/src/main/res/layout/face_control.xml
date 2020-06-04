@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_face_control"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#437CA8"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="人脸识别管理"
+            app:titleTextColor="#FFFFFF" />
+
+
+    </LinearLayout>
+
+</FrameLayout>

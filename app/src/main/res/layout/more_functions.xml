@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_more_functions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#437CA8"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="更多功能"
+            app:titleTextColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/face_control"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/more_top"
+            android:padding="15dp"
+            android:text="人脸识别管理"
+            android:textAllCaps="false"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/clear_auto_control"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/more_middle"
+            android:padding="15dp"
+            android:text="取消定时开关机"
+            android:textAllCaps="false"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/about_us"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/more_bottom"
+            android:padding="15dp"
+            android:text="关于我们"
+            android:textAllCaps="false"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+</FrameLayout>
