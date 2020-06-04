@@ -14,4 +14,5 @@
     <string name="help">帮助</string>
     <string name="zhunbeipeidui">正在准备配对……</string>
     <string name="qianwgnlanya">前往蓝牙配置界面</string>
+    <string name="duojijioadu">请输入舵机角度：</string>
 </resources>

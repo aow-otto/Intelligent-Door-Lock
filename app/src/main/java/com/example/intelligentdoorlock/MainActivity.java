@@ -21,16 +21,21 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -69,15 +74,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String message;
     private Message message_to_transfer = new Message();
     public int safety_mode;
+    public int unlock_direction;
     public static final int UPDATE_TEXT1 = 1;
     public static final int UPDATE_TEXT2 = 2;
     public static final int UPDATE_TEXT3 = 3;
     private boolean thread_open_close = false;
 
     private TextView click;
-    private TextView text;
+    private TextView click2;
     private List<GetConfigReq.DatasBean> datasBeanList;
+    private List<GetConfigReq.DatasBean> datasBeanList2;
     private String categoryName;
+    private String categoryName2;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -131,7 +139,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initView();
         initData();
         initListener();
-
+        initView2();
+        initData2();
+        initListener2();
         button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
         button3 = (Button) findViewById(R.id.button3);
@@ -144,16 +154,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //此处部分参数可看作未设置时的默认值
         ((GlobalVarious) getApplication()).setCurrent_mode("waiting");
         ((GlobalVarious) getApplication()).setSafety_mode("1");
+        ((GlobalVarious) getApplication()).setUnlock_direction("1");
+
+        Log.d(TAG, "The safety_mode after initialization is " + ((GlobalVarious) getApplication()).getSafety_mode());
+        Log.d(TAG, "The unlock_direction after initialization is " + ((GlobalVarious) getApplication()).getUnlock_direction());
 
         switch (((GlobalVarious) getApplication()).getSafety_mode()) {
             case "0":
                 categoryName = "设备锁关闭";
+                break;
             case "1":
                 categoryName = "需要验证";
+                break;
             case "2":
                 categoryName = "设备锁开启";
+                break;
             default:
                 Log.e(TAG, "categoryName初始化失败！");
+        }
+
+        switch (((GlobalVarious) getApplication()).getUnlock_direction()) {
+            case "0":
+                categoryName2 = "顺时针";
+                break;
+            case "1":
+                categoryName2 = "逆时针";
+                break;
+            case "2":
+                categoryName2 = "顺逆皆可";
+                break;
+            default:
+                Log.e(TAG, "categoryName2初始化失败！");
         }
 
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
@@ -301,13 +332,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (Objects.equals(id_matched, "")) button4.setEnabled(false);
         button4.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "正在开发中……", Toast.LENGTH_SHORT).show();
+            final EditText inputServer = new EditText(this);
+            inputServer.setInputType(InputType.TYPE_CLASS_NUMBER);
+            inputServer.setHint("请输入0~90度之间的值");
+            inputServer.setGravity(Gravity.CENTER_HORIZONTAL);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("请输入舵机角度：").setView(inputServer).setNegativeButton("取消", null);
+            builder.setPositiveButton("确定", (dialog, which) -> {
+                if (Integer.parseInt(inputServer.getText().toString()) >= 0 && Integer.parseInt(inputServer.getText().toString()) <= 90) {
+                    try {
+                        mmOutStream.write(("set_steer_angle " + inputServer.getText().toString()).getBytes());
+                        ((GlobalVarious) getApplication()).setAuto_control(inputServer.getText().toString());
+                        Toast.makeText(MainActivity.this, "舵机角度设置成功！", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        Toast.makeText(MainActivity.this, "传输失败，请重试！", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "设置失败！\n请重试，并输入0~90之间的角度。", Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.show();
         });
 
         if (Objects.equals(id_matched, "")) button5.setEnabled(false);
-        button5.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "正在开发中……", Toast.LENGTH_SHORT).show();
-        });
+        button5.setOnClickListener(this::setAddressSelectorPopup2);
 
         if (Objects.equals(id_matched, "")) button6.setEnabled(false);
         button6.setOnClickListener(v -> {
@@ -480,13 +528,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void initData2() {
+        //模拟请求后台返回数据
+        String response = "{\"ret\":0,\"msg\":\"succes,\",\"datas\":[{\"ID\":\"  0\",\"categoryName\":\"顺时针\",\"state\":\"1\"},{\"ID\":\"1\",\"categoryName\":\"逆时针\",\"state\":\"1\"},{\"ID\":\"2\",\"categoryName\":\"顺逆皆可\",\"state\":\"1\"}]}";
+        GetConfigReq getConfigReq = new Gson().fromJson(response, GetConfigReq.class);
+        //0请求表示成功
+        if (getConfigReq.getRet() == 0) {
+            //滚动选择数据集合
+            datasBeanList2 = getConfigReq.getDatas();
+        }
+    }
+
     private void initView() {
         click = findViewById(R.id.button3);
-        text = findViewById(R.id.text);
+    }
+
+    private void initView2() {
+        click2 = findViewById(R.id.button5);
     }
 
     private void initListener() {
         click.setOnClickListener(this);
+    }
+
+    private void initListener2() {
+        click2.setOnClickListener(this);
     }
 
     /**
@@ -496,9 +562,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void setAddressSelectorPopup(View v) {
         int screenHeight = getResources().getDisplayMetrics().heightPixels;
-
         CommonPopWindow.newBuilder()
                 .setView(R.layout.choice_view)
+                .setAnimationStyle(R.style.AppTheme)
+                .setBackgroundDrawable(new BitmapDrawable())
+                .setSize(ViewGroup.LayoutParams.MATCH_PARENT, Math.round(screenHeight * 0.3f))
+                .setViewOnClickListener(this)
+                .setBackgroundDarkEnable(true)
+                .setBackgroundAlpha(0.7f)
+                .setBackgroundDrawable(new ColorDrawable(999999))
+                .build(this)
+                .showAsBottom(v);
+    }
+
+    private void setAddressSelectorPopup2(View v) {
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        CommonPopWindow.newBuilder()
+                .setView(R.layout.choice_view2)
                 .setAnimationStyle(R.style.AppTheme)
                 .setBackgroundDrawable(new BitmapDrawable())
                 .setSize(ViewGroup.LayoutParams.MATCH_PARENT, Math.round(screenHeight * 0.3f))
@@ -525,8 +605,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 //完成按钮
                 imageBtn.setOnClickListener(v -> {
+                    Log.d(TAG, "The safety_mode now is " + safety_mode);
                     mPopupWindow.dismiss();
-                    //text.setText(categoryName);
                     switch (categoryName) {
                         case "设备锁关闭":
                             safety_mode = 0;
@@ -547,7 +627,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             ((GlobalVarious) getApplication()).setSafety_mode(String.valueOf(safety_mode));
                             Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                break;
+            case R.layout.choice_view2:
+                TextView imageBtn2 = view.findViewById(R.id.img_guanbi2);
+                PickerScrollView addressSelector2 = view.findViewById(R.id.address2);
+
+                // 设置数据，默认选择第一条
+                addressSelector2.setData(datasBeanList2);
+
+                //滚动监听
+                addressSelector2.setOnSelectListener(pickers -> categoryName2 = pickers.getCategoryName());
+
+                //完成按钮
+                imageBtn2.setOnClickListener(v -> {
+                    Log.d(TAG, "Having tapped finish button.");
+                    mPopupWindow.dismiss();
+                    switch (categoryName2) {
+                        case "顺时针":
+                            unlock_direction = 0;
+                            break;
+                        case "逆时针":
+                            unlock_direction = 1;
+                            break;
+                        case "顺逆皆可":
+                            unlock_direction = 2;
+                            break;
+                        default:
+                            unlock_direction = -1;
+                    }
+                    Log.d(TAG, "Having defined unlock_direction of " + categoryName2);
+                    if (unlock_direction != -1) {
+                        try {
+                            mmOutStream.write(("set_safety_mode " + unlock_direction).getBytes());
+                            ((GlobalVarious) getApplication()).setSafety_mode(String.valueOf(unlock_direction));
                             Toast.makeText(MainActivity.this, "设置成功！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
