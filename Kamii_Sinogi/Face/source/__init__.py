@@ -1,0 +1,1 @@
+Kamii_Sinogi=39
