@@ -372,18 +372,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (Objects.equals(id_matched, "")) button1.setEnabled(false);
         button1.setOnClickListener(v -> {
-            try {
-                if (((GlobalVarious) getApplication()).getCurrent_mode().equals("waiting")) {
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请勿重复点击！", Toast.LENGTH_LONG).show();
+            } else {
+                try {
                     mmOutStream.write("unlock_door".getBytes());
                     ((GlobalVarious) getApplication()).setCurrent_mode("working");
                     time = System.currentTimeMillis();
                     Toast.makeText(MainActivity.this, "正在开门中！", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "正在开门中，请勿重复点击！\n" +
-                            "若机器未处在工作状态，请检查并刷新。", Toast.LENGTH_LONG).show();
+                } catch (IOException e) {
+                    Toast.makeText(MainActivity.this, "开门失败！\n请检查蓝牙连接后重试。", Toast.LENGTH_SHORT).show();
                 }
-            } catch (IOException e) {
-                Toast.makeText(MainActivity.this, "开门失败！\n请检查蓝牙连接后重试。", Toast.LENGTH_SHORT).show();
             }
         });
 
