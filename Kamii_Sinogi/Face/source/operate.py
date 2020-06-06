@@ -51,6 +51,7 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
     larm.set_pwm_freq(60)
     rarm.set_pwm_freq(60)
 
+    light.set_light("green","sblink")
     op_set_angle(larm, port_larm, angle_larm_open)
     op_set_angle(rarm, port_rarm, angle_rarm_open)
     print 'Moving servo on arm to open.'
@@ -67,10 +68,12 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
         unlock.set_pwm(port_unlock, 0, num_lunlock)
     print 'Unlock.'
 
+    light.set_light("green","still")
     time.sleep(time_wait)
     unlock.set_pwm(port_unlock, 0, num_lock)
     print 'Lock.'
 
+    light.set_light("blue","still")
     op_set_angle(body, port_body, angle_body_close)
     print 'Moving servo on body to close.'
     op_set_angle(leg, port_leg, angle_leg_close)
@@ -81,7 +84,6 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
     op_set_angle(rarm, port_rarm, angle_rarm_close)
     time.sleep(6*time_sleep)
     print 'Moving servo on arm to close.'
-    light_third.join()
 
 
 class operate (threading.Thread):
@@ -93,16 +95,18 @@ class operate (threading.Thread):
     def run(self):
         op_operate(self.angle_qingxie, self.unlock_direction)
 
+def op_operate_with_light(angle_qingxie=45, unlock_direction='r'):
+    op = operate(angle_qingxie,unlock_direction)
+    op.start()
+    light_first = light.light("green", "sblink", 2)
+    light_first.start()
+    light_first.join()
+    light_first = light.light("green", "still", 10)
+    light_first.start()
+    light_second.join()
+    light_third = light.light_still("blue")
+    light_third.start()
+    light_third.join()
+    op.join()
 
-op = operate()
-op.start()
-light_first = light.light("green", "sblink", 2)
-light_first.start()
-light_first.join()
-light_first = light.light("green", "still", 10)
-light_first.start()
-light_second.join()
-light_third = light.light_still("blue")
-light_third.start()
-light_third.join()
-op.join()
+# op_operate()

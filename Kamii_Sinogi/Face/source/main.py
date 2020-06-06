@@ -24,6 +24,9 @@ while True:
 				setting["sys_control"] = False
 				json.dump(setting,file_close)
 			file_close.close()
+    if setting["sys_control"]==False:
+        light.set_light("black","still")
+        continue
     operate.angle_qingxie = setting["steer_angle"]
     operate.unlock_direction = setting["unlock_direction"]
     if ultra.DistanceMeasure() == 1:
@@ -33,6 +36,7 @@ while True:
             bluetooth_check = False
         elif setting["safety_mode"] == 2:
             bluetooth_check = bluetooth.sys_bluetooth()
+        light.set_light("qing","sblink")
         if bluetooth_check == True:
             if setting["unlock_direction"] != 1:
                 operate.op_operate(setting["steer_angle"], 'r')

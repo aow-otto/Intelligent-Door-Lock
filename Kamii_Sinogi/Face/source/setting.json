@@ -1,1 +1,1 @@
-{"safety_mode": 1, "autoctrl_open": [[17, 40]], "autoctrl_close": [], "sys_control": false, "steer_angle": 35, "unlock_direction": 1}
+{"safety_mode": 0, "autoctrl_open": [[17, 40], [4, 45]], "autoctrl_close": [[5, 31]], "sys_control": false, "steer_angle": 35, "unlock_direction": 1}

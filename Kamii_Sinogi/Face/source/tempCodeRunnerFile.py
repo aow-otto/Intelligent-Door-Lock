@@ -1,3 +1,2 @@
-while GPIO.input(echo) == 0:
-	# 	send_time = time.time()
-	# 	pass
+    if type(light_set["status"]) == unicode:
+        light_set["status"]=status[light_set["status"]]

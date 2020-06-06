@@ -1,12 +1,13 @@
 import RPi.GPIO
 import time
+import json
 import threading
-dictionary = {"red": [255, 0, 0], "green": [0, 255, 0],
+dictionary = {"red": [255, 0, 0], "green": [0, 255, 0], "qing": [0, 255, 255],
               "blue": [0, 0, 255], "white": [255, 255, 255], "black": [0, 0, 0]}
 status = {"still": 0, "sblink": 0.25, "blink": 0.5, "lblink": 1}
 
 
-class light(threading.Thread):
+class light_thread(threading.Thread):
     def __init__(self, colour="red", stat="still", length=3):
         threading.Thread.__init__(self)
         if type(colour) == str:
@@ -33,6 +34,7 @@ class light(threading.Thread):
         self.pwmR.start(0)
         self.pwmG.start(0)
         self.pwmB.start(0)
+
     def run(self):
         if self.status == 0:
             self.pwmR.ChangeDutyCycle(self.colour[0])
@@ -50,9 +52,10 @@ class light(threading.Thread):
                     self.pwmG.ChangeDutyCycle(0)
                     self.pwmB.ChangeDutyCycle(0)
                     time.sleep(self.status)
-class light_still(threading.Thread):
+
+
+class light():
     def __init__(self, colour="red"):
-        threading.Thread.__init__(self)
         if type(colour) == str:
             colour = dictionary[colour]
         for i in range(3):
@@ -75,13 +78,18 @@ class light_still(threading.Thread):
         self.pwmG.start(0)
         self.pwmB.start(0)
 
-
     def start_still(self):
         self.pwmR.ChangeDutyCycle(self.colour[0])
         self.pwmG.ChangeDutyCycle(self.colour[1])
         self.pwmB.ChangeDutyCycle(self.colour[2])
-        time.sleep(1)
+        time.sleep(0.5)
 
-
-# p = light("white", "still")
-# p.start_still()
+def set_light(colour,status):
+    if type(colour)==str:
+        colour=dictionary[colour]
+    light_setting={}
+    light_setting["colour"]=colour
+    light_setting["status"]=status
+    with open("/home/pi/Kamii_Sinogi/Face/source/light.json",'w') as file_write:
+        json.dump(light_setting,file_write)
+    file_write.close()

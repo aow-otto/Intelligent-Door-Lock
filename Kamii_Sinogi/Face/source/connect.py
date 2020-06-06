@@ -5,8 +5,8 @@ import json
 import os
 from sh import bash
 
-command = "sudo rfcomm watch hci0 0 /rfcomm_check"
-code = os.popen(command)
+# command = "sudo rfcomm watch hci0 0 /rfcomm_check"
+# code = os.popen(command)
 while True:
     try:
         ser = serial.Serial("/dev/rfcomm0", 9600)

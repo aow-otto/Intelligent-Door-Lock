@@ -1,0 +1,1 @@
+sudo rfcomm watch hci0 0 /rfcomm_check
