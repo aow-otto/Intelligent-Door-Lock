@@ -17,6 +17,7 @@
             android:background="#437CA8"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="蓝牙连接"
+            android:fontFamily="@font/hgy3_cnki"
             app:titleTextColor="#FFFFFF" />
 
         <TextView
@@ -29,6 +30,7 @@
             android:background="@drawable/reamtch"
             android:gravity="center"
             android:text="@string/zhunbeipeidui"
+            android:fontFamily="@font/hgy3_cnki"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
@@ -40,6 +42,7 @@
             android:layout_marginTop="5dp"
             android:background="@drawable/gotobluetooth"
             android:textSize="15sp"
+            android:fontFamily="@font/hgy3_cnki"
             android:text="@string/qianwgnlanya" />
 
         <ListView

@@ -353,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             id_matched = "";
                             mac_address = "";
                             ((GlobalVarious) getApplication()).setGlobalBlueSocket(null);
+                            ((GlobalVarious) getApplication()).setLatest_modified("");
                             Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
                             startActivityForResult(intent, 1);
                         } catch (IOException ignored) {
