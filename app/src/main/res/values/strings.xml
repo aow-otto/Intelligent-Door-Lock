@@ -15,4 +15,11 @@
     <string name="zhunbeipeidui">正在准备配对……</string>
     <string name="qianwgnlanya">前往蓝牙配置界面</string>
     <string name="duojijioadu">请输入舵机角度：</string>
+    <string name="zhishideng">指示灯说明</string>
+    <string name="quxiaodingshikaiguanji">取消定时开关机</string>
+    <string name="indicator_light_introduction">
+        以下是指示灯显示颜色与状态对应表：\n
+        \n检测状态\t\t\t\t\t\t\t\t\t\t\t\t黄色\t\n摄像头开启\t\t\t\t\t\t\t\t\t蓝色\t\n工作中\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t青色\t\n门锁已开启\t\t\t\t\t\t\t\t\t绿色\t
+    </string>
+    <string name="aboutus">关于我们</string>
 </resources>

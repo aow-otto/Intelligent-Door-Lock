@@ -43,7 +43,21 @@
             android:layout_marginEnd="6dp"
             android:background="@drawable/more_middle"
             android:padding="15dp"
-            android:text="取消定时开关机"
+            android:text="@string/quxiaodingshikaiguanji"
+            android:textAllCaps="false"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/indicator_light"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/more_middle"
+            android:padding="15dp"
+            android:text="@string/zhishideng"
             android:textAllCaps="false"
             android:textSize="20sp" />
 
@@ -57,7 +71,7 @@
             android:layout_marginEnd="6dp"
             android:background="@drawable/more_bottom"
             android:padding="15dp"
-            android:text="关于我们"
+            android:text="@string/aboutus"
             android:textAllCaps="false"
             android:textSize="20sp" />
 

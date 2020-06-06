@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothSocket;
 public class GlobalVarious extends Application {
     private BluetoothSocket globalBlueSocket = null;
     private String open_close = "";
-    private String time_set = "";
     private String auto_control_open = "";
     private String auto_control_close = "";
     private String safety_mode = "";
@@ -15,6 +14,7 @@ public class GlobalVarious extends Application {
     private String indicator_light_mode = "";
     private String battery = "";
     private String current_mode = "";
+    private String latest_modified = "";
 
     public void setGlobalBlueSocket(BluetoothSocket globalBlueSocket) {
         this.globalBlueSocket = globalBlueSocket;
@@ -26,22 +26,16 @@ public class GlobalVarious extends Application {
 
     public void setOpen_close(String string) {
         this.open_close = string;
+        latest_modified = "open_close";
     }
 
     public String getOpen_close() {
         return open_close;
     }
 
-    public void setTime_set(String string) {
-        this.time_set = string;
-    }
-
-    public String getTime_set() {
-        return time_set;
-    }
-
     public void setAuto_control_open(String string) {
         this.auto_control_open = string;
+        latest_modified = "auto_control_open";
     }
 
     public String getAuto_control_open() {
@@ -50,6 +44,7 @@ public class GlobalVarious extends Application {
 
     public void setAuto_control_close(String string) {
         this.auto_control_close = string;
+        latest_modified = "auto_control_close";
     }
 
     public String getAuto_control_close() {
@@ -58,6 +53,7 @@ public class GlobalVarious extends Application {
 
     public void setSafety_mode(String string) {
         this.safety_mode = string;
+        latest_modified = "safety_mode";
     }
 
     public String getSafety_mode() {
@@ -66,6 +62,7 @@ public class GlobalVarious extends Application {
 
     public void setSteer_angle(String string) {
         this.steer_angle = string;
+        latest_modified = "steer_angle";
     }
 
     public String getSteer_angle() {
@@ -74,6 +71,7 @@ public class GlobalVarious extends Application {
 
     public void setUnlock_direction(String string) {
         this.unlock_direction = string;
+        latest_modified = "unlock_direction";
     }
 
     public String getUnlock_direction() {
@@ -82,6 +80,7 @@ public class GlobalVarious extends Application {
 
     public void setIndicator_light_mode(String string) {
         this.indicator_light_mode = string;
+        latest_modified = "indicator_light_mode";
     }
 
     public String getIndicator_light_mode() {
@@ -102,5 +101,13 @@ public class GlobalVarious extends Application {
 
     public String getCurrent_mode() {
         return current_mode;
+    }
+
+    public void setLatest_modified(String string) {
+        this.latest_modified = string;
+    }
+
+    public String getLatest_modified() {
+        return latest_modified;
     }
 }

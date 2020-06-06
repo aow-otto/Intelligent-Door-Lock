@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<GetConfigReq.DatasBean> datasBeanList2;
     private String categoryName;
     private String categoryName2;
+    private String latest_modified_object = "";
+    private String latest_modified_content = "";
+    public long time;
+    private static final long PERIOD = 19000;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -142,12 +146,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initView2();
         initData2();
         initListener2();
-        button1 = (Button) findViewById(R.id.button1);
-        button2 = (Button) findViewById(R.id.button2);
-        button3 = (Button) findViewById(R.id.button3);
-        button4 = (Button) findViewById(R.id.button4);
-        button5 = (Button) findViewById(R.id.button5);
-        button6 = (Button) findViewById(R.id.button6);
+        button1 = findViewById(R.id.button1);
+        button2 = findViewById(R.id.button2);
+        button3 = findViewById(R.id.button3);
+        button4 = findViewById(R.id.button4);
+        button5 = findViewById(R.id.button5);
+        button6 = findViewById(R.id.button6);
 
         //此部分代码预设各参数值，仅供同步功能实现以前调试使用
         //实际情况中，应当在连接时即进行参数同步，而不需要此步工作
@@ -155,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((GlobalVarious) getApplication()).setCurrent_mode("waiting");
         ((GlobalVarious) getApplication()).setSafety_mode("1");
         ((GlobalVarious) getApplication()).setUnlock_direction("1");
+        ((GlobalVarious) getApplication()).setOpen_close("close");
+        ((GlobalVarious) getApplication()).setBattery("90");
+        ((GlobalVarious) getApplication()).setLatest_modified("");
+        time = 0;
 
         Log.d(TAG, "The safety_mode after initialization is " + ((GlobalVarious) getApplication()).getSafety_mode());
         Log.d(TAG, "The unlock_direction after initialization is " + ((GlobalVarious) getApplication()).getUnlock_direction());
@@ -197,42 +205,126 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         id_matched = pref.getString("id_matched", "");
 
         final ToggleButton toggleButton;
-        toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
+        toggleButton = findViewById(R.id.toggleButton);
         toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                //String inputText = "match " + id_matched + "\nsys_control open\nrequest_setting_file";
-                //save(inputText);
-                if (id_matched != null) {
-                    try {
-                        mmOutStream.write("sys_control open".getBytes());
-                        ((GlobalVarious) getApplication()).setOpen_close("open");
-                        Toast.makeText(MainActivity.this, "已开启！", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
-                        toggleButton.setChecked(false);
-                    }
-                }
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
             } else {
-                if (id_matched != null) {
-                    //String inputText = "match " + id_matched + "\nsys_control close";
+                if (isChecked) {
+                    //String inputText = "match " + id_matched + "\nsys_control open\nrequest_setting_file";
                     //save(inputText);
-                    try {
-                        mmOutStream.write("sys_control close".getBytes());
-                        ((GlobalVarious) getApplication()).setOpen_close("close");
-                        Toast.makeText(MainActivity.this, "已关闭！", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
-                        toggleButton.setChecked(true);
+                    if (id_matched != null) {
+                        try {
+                            mmOutStream.write("sys_control open".getBytes());
+                            ((GlobalVarious) getApplication()).setOpen_close("open");
+                            Toast.makeText(MainActivity.this, "已开启！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
+                            toggleButton.setChecked(false);
+                        }
+                    }
+                } else {
+                    if (id_matched != null) {
+                        //String inputText = "match " + id_matched + "\nsys_control close";
+                        //save(inputText);
+                        try {
+                            mmOutStream.write("sys_control close".getBytes());
+                            ((GlobalVarious) getApplication()).setOpen_close("close");
+                            Toast.makeText(MainActivity.this, "已关闭！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
+                            toggleButton.setChecked(true);
+                        }
                     }
                 }
             }
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "上一次修改时间：", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        //实验代码：
+        //((GlobalVarious) getApplication()).setSafety_mode("2");
 
-        idmatch = (Button) findViewById(R.id.idmatch);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            if (((GlobalVarious) getApplication()).getLatest_modified().equals("")) {
+                Snackbar.make(v, "尚未做任何修改"
+                        , Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            } else {
+                switch (((GlobalVarious) getApplication()).getLatest_modified()) {
+                    case "open_close":
+                        latest_modified_object = "运行状态";
+                        latest_modified_content = ((GlobalVarious) getApplication()).getOpen_close();
+                        if (latest_modified_content.equals("open")) latest_modified_content = "开机";
+                        if (latest_modified_content.equals("close")) latest_modified_content = "待机";
+                        break;
+                    case "auto_control_open":
+                        latest_modified_object = "定时开机时间";
+                        String[] latest_modified_content_arr1 = (((GlobalVarious) getApplication()).getAuto_control_open()).split("\\s+");
+                        latest_modified_content = latest_modified_content_arr1[1] + ":" + latest_modified_content_arr1[2];
+                        break;
+                    case "auto_control_close":
+                        latest_modified_object = "定时关机时间";
+                        String[] latest_modified_content_arr2 = (((GlobalVarious) getApplication()).getAuto_control_close()).split("\\s+");
+                        latest_modified_content = latest_modified_content_arr2[1] + ":" + latest_modified_content_arr2[2];
+                        break;
+                    case "clear_sys_auto_control_open":
+                        latest_modified_object = "取消定时开机";
+                        break;
+                    case "clear_sys_auto_control_close":
+                        latest_modified_object = "取消定时关机";
+                        break;
+                    case "safety_mode":
+                        latest_modified_object = "安全模式";
+                        latest_modified_content = ((GlobalVarious) getApplication()).getSafety_mode();
+                        switch (latest_modified_content) {
+                            case "0":
+                                latest_modified_content = "设备锁关闭";
+                                break;
+                            case "1":
+                                latest_modified_content = "需要验证";
+                                break;
+                            case "2":
+                                latest_modified_content = "设备锁开启";
+                                break;
+                            default:
+                        }
+                        break;
+                    case "steer_angle":
+                        latest_modified_object = "舵机角度";
+                        latest_modified_content = ((GlobalVarious) getApplication()).getSteer_angle() + "°";
+                        break;
+                    case "unlock_direction":
+                        latest_modified_object = "开锁方向";
+                        latest_modified_content = ((GlobalVarious) getApplication()).getUnlock_direction();
+                        switch (latest_modified_content) {
+                            case "0":
+                                latest_modified_content = "顺时针";
+                                break;
+                            case "1":
+                                latest_modified_content = "逆时针";
+                                break;
+                            case "2":
+                                latest_modified_content = "顺逆皆可";
+                                break;
+                            default:
+                        }
+                        break;
+                    case "indicator_light_mode":
+                        latest_modified_object = "指示灯模式";
+                        latest_modified_content = ((GlobalVarious) getApplication()).getIndicator_light_mode();
+                        break;
+                    default:
+                }
+                if (!latest_modified_content.equals("")) {
+                    Snackbar.make(v, "上一次修改：" + latest_modified_object + "  " + latest_modified_content
+                            , Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else {
+                    Snackbar.make(v, "上一次修改：" + latest_modified_object
+                            , Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
+            }
+        });
+
+        idmatch = findViewById(R.id.idmatch);
         if (Objects.equals(id_matched, "")) idmatch.setText("未连接设备       ");
         else idmatch.setText("门锁ID：" + id_matched + "    ");
         idmatch.setOnClickListener(v -> {
@@ -244,32 +336,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         "\n如果您想要重新配对，请点击下面的“重新配对”按钮。", Toast.LENGTH_LONG).show();
         });
 
-        Button rematch = (Button) findViewById(R.id.rematch);
+        Button rematch = findViewById(R.id.rematch);
         rematch.setOnClickListener(v -> {
-            if (!Objects.equals(id_matched, "")) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setTitle("提示消息");
-                dialog.setMessage("您确定要重新配对吗？");
-                dialog.setCancelable(false);
-                dialog.setPositiveButton("是的", (dialog1, which) -> {
-                    try {
-                        thread_open_close = false;
-                        socket.close();
-                        id_matched = "";
-                        mac_address = "";
-                        ((GlobalVarious) getApplication()).setGlobalBlueSocket(null);
-                        Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
-                        startActivityForResult(intent, 1);
-                    } catch (IOException ignored) {
-                        Toast.makeText(MainActivity.this, "错误！\n关闭socket失败！", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                dialog.setNegativeButton("取消", (dialog12, which) -> {
-                });
-                dialog.show();
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
             } else {
-                Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
-                startActivityForResult(intent, 1);
+                if (!Objects.equals(id_matched, "")) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    dialog.setTitle("提示消息");
+                    dialog.setMessage("您确定要重新配对吗？");
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("是的", (dialog1, which) -> {
+                        try {
+                            thread_open_close = false;
+                            socket.close();
+                            id_matched = "";
+                            mac_address = "";
+                            ((GlobalVarious) getApplication()).setGlobalBlueSocket(null);
+                            Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
+                            startActivityForResult(intent, 1);
+                        } catch (IOException ignored) {
+                            Toast.makeText(MainActivity.this, "错误！\n关闭socket失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    dialog.setNegativeButton("取消", (dialog12, which) -> {
+                    });
+                    dialog.show();
+                } else {
+                    Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
+                    startActivityForResult(intent, 1);
+                }
             }
         });
 
@@ -279,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (((GlobalVarious) getApplication()).getCurrent_mode().equals("waiting")) {
                     mmOutStream.write("unlock_door".getBytes());
                     ((GlobalVarious) getApplication()).setCurrent_mode("working");
+                    time = System.currentTimeMillis();
                     Toast.makeText(MainActivity.this, "正在开门中！", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "正在开门中，请勿重复点击！\n" +
@@ -291,77 +388,91 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (Objects.equals(id_matched, "")) button2.setEnabled(false);
         button2.setOnClickListener(v -> {
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
+            } else {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle("请选择您需要设置的内容：");
+                dialog.setMessage("提示：若需要取消定时开关机，请前往更多功能——取消定时开关机。");
+                dialog.setCancelable(false);
+                dialog.setNegativeButton("定时开机", (dialog1, which) -> {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+                            (view, hourOfDay, minute) -> {
+                                try {
+                                    mmOutStream.write(("sys_autocontrol open " + hourOfDay + " " + minute).getBytes());
+                                    ((GlobalVarious) getApplication()).setAuto_control_open(hourOfDay + " " + minute);
+                                    Toast.makeText(MainActivity.this, "定时开机设置成功！", Toast.LENGTH_SHORT).show();
+                                } catch (IOException e) {
+                                    Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                                }
+                            }, 0, 0, true);
+                    timePickerDialog.show();
+                });
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-            dialog.setTitle("请选择您需要设置的内容：");
-            dialog.setMessage("提示：若需要取消定时开关机，请前往更多功能——取消定时开关机。");
-            dialog.setCancelable(false);
-            dialog.setNegativeButton("定时开机", (dialog1, which) -> {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
-                        (view, hourOfDay, minute) -> {
-                            try {
-                                mmOutStream.write(("sys_autocontrol open " + hourOfDay + " " + minute).getBytes());
-                                ((GlobalVarious) getApplication()).setAuto_control_open(hourOfDay + " " + minute);
-                                Toast.makeText(MainActivity.this, "定时开机设置成功！", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        }, 0, 0, true);
-                timePickerDialog.show();
-            });
+                dialog.setNeutralButton("取消", (dialog1, which) -> {
+                });
 
-            dialog.setNeutralButton("取消", (dialog1, which) -> {
-            });
-
-            dialog.setPositiveButton("定时关机", (dialog12, which) -> {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
-                        (view, hourOfDay, minute) -> {
-                            try {
-                                mmOutStream.write(("sys_autocontrol close " + hourOfDay + " " + minute).getBytes());
-                                ((GlobalVarious) getApplication()).setAuto_control_close(hourOfDay + " " + minute);
-                                Toast.makeText(MainActivity.this, "定时关机设置成功！", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        }, 0, 0, true);
-                timePickerDialog.show();
-            });
-            dialog.show();
+                dialog.setPositiveButton("定时关机", (dialog12, which) -> {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+                            (view, hourOfDay, minute) -> {
+                                try {
+                                    mmOutStream.write(("sys_autocontrol close " + hourOfDay + " " + minute).getBytes());
+                                    ((GlobalVarious) getApplication()).setAuto_control_close(hourOfDay + " " + minute);
+                                    Toast.makeText(MainActivity.this, "定时关机设置成功！", Toast.LENGTH_SHORT).show();
+                                } catch (IOException e) {
+                                    Toast.makeText(MainActivity.this, "设置失败！", Toast.LENGTH_SHORT).show();
+                                }
+                            }, 0, 0, true);
+                    timePickerDialog.show();
+                });
+                dialog.show();
+            }
         });
 
         if (Objects.equals(id_matched, "")) button3.setEnabled(false);
-        button3.setOnClickListener(this::setAddressSelectorPopup);
+        button3.setOnClickListener(v -> {
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
+            } else {
+                setAddressSelectorPopup(v);
+            }
+        });
 
         if (Objects.equals(id_matched, "")) button4.setEnabled(false);
         button4.setOnClickListener(v -> {
-            final EditText inputServer = new EditText(this);
-            inputServer.setInputType(InputType.TYPE_CLASS_NUMBER);
-            inputServer.setHint("请输入0~90度之间的值");
-            inputServer.setGravity(Gravity.CENTER_HORIZONTAL);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("请输入舵机角度：").setView(inputServer).setNegativeButton("取消", null);
-            builder.setPositiveButton("确定", (dialog, which) -> {
-                if (Integer.parseInt(inputServer.getText().toString()) >= 0 && Integer.parseInt(inputServer.getText().toString()) <= 90) {
-                    try {
-                        mmOutStream.write(("set_steer_angle " + inputServer.getText().toString()).getBytes());
-                        ((GlobalVarious) getApplication()).setSteer_angle(inputServer.getText().toString());
-                        Toast.makeText(MainActivity.this, "舵机角度设置成功！", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(MainActivity.this, "传输失败，请重试！", Toast.LENGTH_SHORT).show();
+            if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
+                Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
+            } else {
+                final EditText inputServer = new EditText(this);
+                inputServer.setInputType(InputType.TYPE_CLASS_NUMBER);
+                inputServer.setHint("请输入0~90度之间的值");
+                inputServer.setGravity(Gravity.CENTER_HORIZONTAL);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("请输入舵机角度：").setView(inputServer).setNegativeButton("取消", null);
+                builder.setPositiveButton("确定", (dialog, which) -> {
+                    if (Integer.parseInt(inputServer.getText().toString()) >= 0 && Integer.parseInt(inputServer.getText().toString()) <= 90) {
+                        try {
+                            mmOutStream.write(("set_steer_angle " + inputServer.getText().toString()).getBytes());
+                            ((GlobalVarious) getApplication()).setSteer_angle(inputServer.getText().toString());
+                            Toast.makeText(MainActivity.this, "舵机角度设置成功！", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Toast.makeText(MainActivity.this, "传输失败，请重试！", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "设置失败！\n请重试，并输入0~90之间的角度。", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(MainActivity.this, "设置失败！\n请重试，并输入0~90之间的角度。", Toast.LENGTH_SHORT).show();
-                }
-            });
-            builder.show();
+                });
+                builder.show();
+            }
         });
 
         if (Objects.equals(id_matched, "")) button5.setEnabled(false);
         button5.setOnClickListener(this::setAddressSelectorPopup2);
 
-        //if (Objects.equals(id_matched, "")) button6.setEnabled(false);
+        if (Objects.equals(id_matched, "")) button6.setEnabled(false);
         button6.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, MoreFunctionsActivity.class);
+            intent.putExtra("time", time);
             startActivity(intent);
         });
     }
@@ -442,11 +553,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 case "sys_control":
                                     ((GlobalVarious) getApplication()).setOpen_close(order[2]);
                                     break;
-                                case "sys_time":
-
-                                    break;
                                 case "sys_autocontrol":
-
+                                    if (order[2].equals("open")) {
+                                        ((GlobalVarious) getApplication()).setAuto_control_open(order[3] + " " + order[4]);
+                                    } else if (order[2].equals("close")) {
+                                        ((GlobalVarious) getApplication()).setAuto_control_close(order[3] + " " + order[4]);
+                                    }
                                     break;
                                 case "set_safety_mode":
                                     ((GlobalVarious) getApplication()).setSafety_mode(order[2]);

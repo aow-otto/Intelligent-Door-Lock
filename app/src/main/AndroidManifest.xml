@@ -6,9 +6,9 @@
     <application
         android:name=".GlobalVarious"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -31,6 +31,14 @@
         <activity
             android:name=".FaceControlActivity"
             android:label="人脸识别管理"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".IndicatorLightActivity"
+            android:label="指示灯说明"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AboutUsActivity"
+            android:label="关于我们"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
