@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CommonPopWindow.ViewClickListener {
     private static final String TAG = "MainActivity";
@@ -601,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "RtlHardcoded"})
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -625,7 +626,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "完成刷新！", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.help:
-                Toast.makeText(this, "正在开发中……", Toast.LENGTH_SHORT).show();
+                if (id_matched.equals("")) {
+                    Toast.makeText(this, "您还尚未连接，请先打开装置，并点击“重新配对”按钮，进行配对！",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "您已经成功连接装置，可以根据需要，通过下方的按键设置功能。\n" +
+                            "如果您想了解更多关于我们的信息，请点击“更多功能”-“关于我们”。", Toast.LENGTH_LONG).show();
+                }
                 break;
             default:
         }
@@ -809,6 +816,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //返回字符串结果
         return result;
+    }
+
+    public void showMyToast(final Toast toast, final int cnt) {
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.show();
+            }
+        }, 0, 3000);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.cancel();
+                timer.cancel();
+            }
+        }, cnt);
     }
 
     @Override

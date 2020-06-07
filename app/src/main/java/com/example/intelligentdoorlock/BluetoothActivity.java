@@ -74,7 +74,7 @@ public class BluetoothActivity extends AppCompatActivity {
                         socket = gDevice.createRfcommSocketToServiceRecord(MY_UUID);
                     } catch (Exception e) {
                         Log.d("log", "获取Socket失败");
-                        Toast.makeText(BluetoothActivity.this,"连接失败！\n错误原因：获取Socket失败。",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BluetoothActivity.this, "连接失败！\n错误原因：获取Socket失败。", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     try {
@@ -94,7 +94,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     } catch (IOException connectException) {
                         // Unable to connect; close the socket and get out
                         Log.d("log", "连接失败");
-                        Toast.makeText(BluetoothActivity.this,"连接失败！\n请重新尝试，如实在无法连接，请到蓝牙配置界面手动连接。",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BluetoothActivity.this, "连接失败！\n请重新尝试，如实在无法连接，请到蓝牙配置界面手动连接。", Toast.LENGTH_SHORT).show();
                         try {
                             socket.close();
                             if (adapter != null) {
@@ -105,7 +105,7 @@ public class BluetoothActivity extends AppCompatActivity {
                             }
                             textView.setText("请选择您要配对的设备");
                         } catch (IOException ignored) {
-                            Toast.makeText(BluetoothActivity.this,"错误！\n关闭socket失败！",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(BluetoothActivity.this, "错误！\n关闭socket失败！", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -132,14 +132,6 @@ public class BluetoothActivity extends AppCompatActivity {
             glvPaired.setAdapter(pairedAdapter);
         }
     }
-    /*@Override
-    protected void onPause() {
-        super.onPause();
-        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-        editor.putString("id_matched", "raspberrypi");
-        editor.putString("mac_address", "DC:A6:32:64:47:80");
-        editor.apply();
-    }*/
 
     private void initBlueTooth() {
         if (adapter != null) {
@@ -197,7 +189,15 @@ public class BluetoothActivity extends AppCompatActivity {
                 Toast.makeText(this, "完成刷新！", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.help_blue:
-                Toast.makeText(this, "正在开发中……", Toast.LENGTH_SHORT).show();
+                if (adapter == null) {
+                    Toast.makeText(this, "非常抱歉，您的蓝牙适配器不存在，无法连接装置！\n" +
+                                    "您可以前往蓝牙设置检查自己的蓝牙设备是否正确安装，如果仍有关于蓝牙设备的问题，请咨询手机供应商。"
+                            , Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "您好，请手动选择装置对应的蓝牙设备并点击，系统会自动帮您连接！\n" +
+                                    "如果无法找到装置对应的蓝牙，请前往蓝牙配置界面搜索并配对，再回到此界面进行连接。"
+                            , Toast.LENGTH_LONG).show();
+                }
                 break;
             default:
         }
