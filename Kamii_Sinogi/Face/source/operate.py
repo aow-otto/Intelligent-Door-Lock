@@ -21,12 +21,12 @@ def op_set_angle(pwm, port, angle):
     pwm.set_pwm(port, 0, num)
 
 
-def op_operate(angle_qingxie=45, unlock_direction='r'):
+def op_operate(angle_qingxie=-15, unlock_direction='r'):
 
     angle_rarm_close = 90
     angle_larm_close = 90
     angle_body_close = 0
-    angle_leg_close = -90
+    angle_leg_close = 0
 
     angle_rarm_open = -90
     angle_larm_open = -90
@@ -51,7 +51,7 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
     larm.set_pwm_freq(60)
     rarm.set_pwm_freq(60)
 
-    light.set_light("green","sblink")
+    light.set_light("green","sblink",True)
     op_set_angle(larm, port_larm, angle_larm_open)
     op_set_angle(rarm, port_rarm, angle_rarm_open)
     print 'Moving servo on arm to open.'
@@ -60,7 +60,7 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
     print 'Moving servo on body to open.'
     op_set_angle(leg, port_leg, angle_leg_open)
     print 'Moving servo on leg to open.'
-    time.sleep(time_sleep)
+    # time.sleep(time_sleep)
 
     if unlock_direction == 'r':
         unlock.set_pwm(port_unlock, 0, num_runlock)
@@ -68,23 +68,23 @@ def op_operate(angle_qingxie=45, unlock_direction='r'):
         unlock.set_pwm(port_unlock, 0, num_lunlock)
     print 'Unlock.'
 
-    light.set_light("green","still")
+    light.set_light("green","still",True)
     time.sleep(time_wait)
     unlock.set_pwm(port_unlock, 0, num_lock)
     print 'Lock.'
 
-    light.set_light("blue","still")
+    light.set_light("blue","still",True)
+
+    op_set_angle(larm, port_larm, angle_larm_close)
+    op_set_angle(rarm, port_rarm, angle_rarm_close)
+    time.sleep(4*time_sleep)
+    print 'Moving servo on arm to close.'
     op_set_angle(body, port_body, angle_body_close)
     print 'Moving servo on body to close.'
     op_set_angle(leg, port_leg, angle_leg_close)
     print 'Moving servo on leg to close.'
-
     time.sleep(time_sleep)
-    op_set_angle(larm, port_larm, angle_larm_close)
-    op_set_angle(rarm, port_rarm, angle_rarm_close)
-    time.sleep(6*time_sleep)
-    print 'Moving servo on arm to close.'
-
+    light.set_solid(False)
 
 class operate (threading.Thread):
     def __init__(self, angle_qingxie=45, unlock_direction='r'):
@@ -109,4 +109,3 @@ def op_operate_with_light(angle_qingxie=45, unlock_direction='r'):
     light_third.join()
     op.join()
 
-# op_operate()

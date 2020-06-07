@@ -1,8 +1,12 @@
-import os,sys,re,requests,json,base64,time,picamera
+import os,sys,re,requests,json,base64,time,picamera,light
 
 account={'api_key':'','api_secret':''}
 account['api_key']='pLkXcTYc1irj2Lqq2_ZzLPWflVrPjSG9'
 account['api_secret']='F6tjVfZxmsngYwC52TlSROKRtYqS5FBx'
+
+def AccountLogin(api_key,api_secret):
+	account['api_key']=api_key
+	account['api_secret']=api_secret
 
 def FileClear(path):
 	list=os.listdir(path)
@@ -13,28 +17,32 @@ def FileClear(path):
 			os.rmdir(stp)
 		else: os.remove(stp)
 
-def getbase64(image):
+def Getbase64(image):
 	return base64.b64encode(open(image,'rb').read())
 
-def CameraCatch(path='Kamii_Sinogi/Face/'):
+def CameraCatch(path='Kamii_Sinogi/'):
+	light.set_light("white","still",True)
 	with picamera.PiCamera() as camera:
 		camera.start_preview();time.sleep(1)
-		camera.capture(path+'stp.jpg')
-		face_token=FaceDetect(path+'stp.jpg')
+		camera.capture(path+'Face/stp.jpg')
+		face_token=FaceDetect(path+'Face/stp.jpg')
+	light.set_solid(False)
+	light.set_light("blue","still")
 	return face_token
 
-def HistorySave(path):
+def HistorySave(path='Kamii_Sinogi/Face/history/'):
 	now=1
 	while os.path.exists(path+'%d'%now): now+=1
 	path+='%d'%now+'/'
 	os.makedirs(path)
 	return path
 
-def CameraJudge(path='Kamii_Sinogi/Face/history/',setname='Sinogi'):
-	path=HistorySave(path)
+def CameraJudge(setname='Sinogi',judgetimes=3,path='Kamii_Sinogi/'):
+	light.set_light("white","still")
+	path=HistorySave(path+'Face/history/')
 	with picamera.PiCamera() as camera:
 		camera.start_preview();time.sleep(1)
-		for now in range(1,4):
+		for now in range(0,judgetimes):
 			camera.capture(path+'%d'%now+'.jpg')
 			unknownface=FaceDetect(path+'%d'%now+'.jpg')
 			possibleface=FaceSearch(unknownface,'Sinogi')
@@ -42,12 +50,9 @@ def CameraJudge(path='Kamii_Sinogi/Face/history/',setname='Sinogi'):
 			time.sleep(0.5)
 	return 1
 
-def HistoryClear(path='Kamii_Sinogi/Face/history'):
-	FileClear(path)
-
 def FaceDetect(path):
 	url='https://api-cn.faceplusplus.com/facepp/v3/detect'
-	data=account;data['image_base64']=getbase64(path)
+	data=account;data['image_base64']=Getbase64(path)
 	reply=requests.post(url,data).json()
 	if reply['face_num']==0: return 'KamiiBaka'
 	else: return reply['faces'][0]['face_token']
@@ -75,8 +80,8 @@ def FacesetGet():
 	reply=requests.post(url,account).json()
 	return reply['facesets']
 
-def FacesetCreate(setname='Sinogi'):
-	path='Kamii_Sinogi/Face/data/'+setname
+def FacesetCreate(setname='Sinogi',path='Kamii_Sinogi/'):
+	path=path+'Face/data/'+setname
 	if os.path.exists(path):
 		path+='_';setname+='_';now=1
 		while(os.path.exists(path+'%d'%now)): now+=1
@@ -86,17 +91,21 @@ def FacesetCreate(setname='Sinogi'):
 	reply=requests.post(url,data).json()
 	os.makedirs(path)
 
-def FacesetDelete(setname,check=0):
-	path='Kamii_Sinogi/Face/data/'+setname
+def FacesetDelete(setname,check=0,path='Kamii_Sinogi/'):
+	path=path+'Face/data/'+setname
 	url='https://api-cn.faceplusplus.com/facepp/v3/faceset/delete'
 	data=account;data['outer_id']=setname;data['check_empty']=check
 	reply=requests.post(url,data).json()
 	FileClear(path);os.rmdir(path)
 
-def FacesetAdd(setname='Sinogi'):
+def FacesetAdd(setname='Sinogi',path='Kamii_Sinogi/'):
 	face_token=CameraCatch()
-	path='Kamii_Sinogi/Face/data/'+setname
-	path_image='Kamii_Sinogi/Face'
+	path_image=path+'Face'
+	if face_token=='KamiiBaka':
+		os.remove(path_image+'/stp.jpg')
+		print('No face found.')
+		return
+	path=path+'Face/data/'+setname
 	old_file=os.path.join(path_image,'stp.jpg')
 	new_file=os.path.join(path,face_token+'.jpg')
 	os.rename(old_file,new_file)
@@ -104,19 +113,23 @@ def FacesetAdd(setname='Sinogi'):
 	data=account;data['outer_id']=setname;data['face_tokens']=face_token
 	reply=requests.post(url,data).json()
 
-def FacesetRemove(setname,face):
-	path='Kamii_Sinogi/Face/data/'+setname
+def FacesetRemove(setname,face_token,path='Kamii_Sinogi/'):
+	path=path+'Face/data/'+setname
 	url='https://api-cn.faceplusplus.com/facepp/v3/faceset/removeface'
-	data=account;data['outer_id']=setname;data['face_tokens']=face
+	data=account;data['outer_id']=setname;data['face_tokens']=face_token
 	reply=requests.post(url,data).json()
-	os.remove(path+'/'+face+'.jpg')
+	os.remove(path+'/'+face_token+'.jpg')
 
-def FacesetClear(setname):
-	list=os.listdir('Kamii_Sinogi/Face/data/'+setname)
+def FacesetClear(setname,path='Kamii_Sinogi/'):
+	list=os.listdir(path+'Face/data/'+setname)
 	for file in list:
 		FacesetRemove(setname,file.split('.')[0])
 
-def DatabaseClear():
+def HistoryClear(path='Kamii_Sinogi/'):
+	FileClear(path+'Face/history/')
+
+def DatabaseClear(path='Kamii_Sinogi/'):
 	list=FacesetGet()
 	for faceset in list:
 		FacesetDelete(faceset['outer_id'])
+	HistoryClear(path)

@@ -84,12 +84,26 @@ class light():
         self.pwmB.ChangeDutyCycle(self.colour[2])
         time.sleep(0.5)
 
-def set_light(colour,status):
+def set_light(colour,status,solid=False):
+    with open("/home/pi/Kamii_Sinogi/Face/source/light.json") as file_read:
+        light_setting=json.load(file_read)
+    file_read.close()
+    if light_setting["solid"]==True and solid==False:
+        return
     if type(colour)==str:
         colour=dictionary[colour]
-    light_setting={}
     light_setting["colour"]=colour
     light_setting["status"]=status
+    light_setting["solid"]=solid
+    with open("/home/pi/Kamii_Sinogi/Face/source/light.json",'w') as file_write:
+        json.dump(light_setting,file_write)
+    file_write.close()
+
+def set_solid(solid):
+    with open("/home/pi/Kamii_Sinogi/Face/source/light.json") as file_read:
+        light_setting=json.load(file_read)
+    file_read.close()
+    light_setting["solid"]=solid
     with open("/home/pi/Kamii_Sinogi/Face/source/light.json",'w') as file_write:
         json.dump(light_setting,file_write)
     file_write.close()

@@ -16,9 +16,14 @@ while True:
             if count != 0:
                 recv = ser.read(count)
                 command = recv.split(' ', -1)
-                with open('/home/pi/Kamii_Sinogi/Face/source/setting.json') as file_open:
-                    setting = json.load(file_open)
-                    file_open.close()
+                try:
+                    with open('/home/pi/Kamii_Sinogi/Face/source/setting.json') as file_open:
+                        setting = json.load(file_open)
+                        file_open.close()
+                except ValueError:
+                    with open('/home/pi/Kamii_Sinogi/Face/source/setting_normal.json') as file_open:
+                        setting = json.load(file_open)
+                        file_open.close()
                 if command[0] == "unlock_door":
                     print command
                     operate.op_operate()

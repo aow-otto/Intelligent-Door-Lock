@@ -1,0 +1,8 @@
+{
+	"sys_control":true,
+	"autoctrl_open":[],
+	"autoctrl_close":[],
+	"safety_mode":0,
+	"steer_angle":-15,
+	"unlock_direction":2
+}
