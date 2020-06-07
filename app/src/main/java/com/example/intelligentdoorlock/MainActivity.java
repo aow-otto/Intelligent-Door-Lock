@@ -641,7 +641,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initData() {
         //模拟请求后台返回数据
-        String response = "{\"ret\":0,\"msg\":\"succes,\",\"datas\":[{\"ID\":\"  0\",\"categoryName\":\"设备锁关闭\",\"state\":\"1\"},{\"ID\":\"1\",\"categoryName\":\"需要验证\",\"state\":\"1\"},{\"ID\":\"2\",\"categoryName\":\"设备锁开启\",\"state\":\"1\"}]}";
+        String response = "{\"ret\":0,\"msg\":\"succes,\",\"datas\":" +
+                "[{\"ID\":\"  0\",\"categoryName\":\"设备锁关闭\",\"state\":\"1\"}" +
+                ",{\"ID\":\"1\",\"categoryName\":\"需要验证\",\"state\":\"1\"}," +
+                "{\"ID\":\"2\",\"categoryName\":\"设备锁开启\",\"state\":\"1\"}]}";
         GetConfigReq getConfigReq = new Gson().fromJson(response, GetConfigReq.class);
         //0请求表示成功
         if (getConfigReq.getRet() == 0) {
@@ -652,7 +655,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initData2() {
         //模拟请求后台返回数据
-        String response = "{\"ret\":0,\"msg\":\"succes,\",\"datas\":[{\"ID\":\"  0\",\"categoryName\":\"顺时针\",\"state\":\"1\"},{\"ID\":\"1\",\"categoryName\":\"逆时针\",\"state\":\"1\"},{\"ID\":\"2\",\"categoryName\":\"顺逆皆可\",\"state\":\"1\"}]}";
+        String response = "{\"ret\":0,\"msg\":\"succes,\",\"datas\":" +
+                "[{\"ID\":\"  0\",\"categoryName\":\"顺时针\",\"state\":\"1\"}," +
+                "{\"ID\":\"1\",\"categoryName\":\"逆时针\",\"state\":\"1\"}," +
+                "{\"ID\":\"2\",\"categoryName\":\"顺逆皆可\",\"state\":\"1\"}]}";
         GetConfigReq getConfigReq = new Gson().fromJson(response, GetConfigReq.class);
         //0请求表示成功
         if (getConfigReq.getRet() == 0) {
