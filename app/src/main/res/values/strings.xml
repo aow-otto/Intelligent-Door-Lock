@@ -19,7 +19,7 @@
     <string name="quxiaodingshikaiguanji">取消定时开关机</string>
     <string name="indicator_light_introduction">
         以下是指示灯显示颜色与状态对应表:\n
-        \n检测状态\t\t\t\t\t\t\t\t\t\t\t\t黄色\n摄像头开启\t\t\t\t\t\t\t\t\t蓝色\n工作中\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t青色\n门锁已开启\t\t\t\t\t\t\t\t\t绿色
+        \n待机状态\t\t\t\t\t\t\t\t\t\t\t\t无指示灯\n等待状态\t\t\t\t\t\t\t\t\t\t\t\t蓝色闪烁\n摄像头开启\t\t\t\t\t\t\t\t\t青色闪烁\n开锁中\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t绿色闪烁\n门锁已开启\t\t\t\t\t\t\t\t\t绿色常亮\n恢复中\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t蓝色常亮\n更新人脸库\t\t\t\t\t\t\t\t\t青色常亮
     </string>
     <string name="aboutus">关于我们</string>
 </resources>
