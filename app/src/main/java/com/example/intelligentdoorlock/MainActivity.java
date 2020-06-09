@@ -60,35 +60,20 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CommonPopWindow.ViewClickListener {
     private static final String TAG = "MainActivity";
-    private Button button1;
-    private Button button2;
-    private Button button3;
-    private Button button4;
-    private Button button5;
-    private Button button6;
-    private Button idmatch;
-    private String id_matched;
-    private String mac_address;
+    private Button button1, button2, button3, button4, button5, button6, idmatch;
+    private String id_matched, mac_address, message;
     private BluetoothSocket socket;
     private InputStream mmInStream;
     private OutputStream mmOutStream;
-    private String message;
     private Message message_to_transfer = new Message();
-    public int safety_mode;
-    public int unlock_direction;
-    public static final int UPDATE_TEXT1 = 1;
-    public static final int UPDATE_TEXT2 = 2;
-    public static final int UPDATE_TEXT3 = 3;
+    public int safety_mode, unlock_direction;
+    public static final int UPDATE_TEXT1 = 1, UPDATE_TEXT2 = 2, UPDATE_TEXT3 = 3;
     private boolean thread_open_close = false;
 
-    private TextView click;
-    private TextView click2;
-    private List<GetConfigReq.DatasBean> datasBeanList;
-    private List<GetConfigReq.DatasBean> datasBeanList2;
-    private String categoryName;
-    private String categoryName2;
-    private String latest_modified_object = "";
-    private String latest_modified_content = "";
+    private TextView click, click2;
+    private List<GetConfigReq.DatasBean> datasBeanList, datasBeanList2;
+    private String categoryName, categoryName2;
+    private String latest_modified_object = "", latest_modified_content = "";
     public long time;
     private static final long PERIOD = 19000;
 
