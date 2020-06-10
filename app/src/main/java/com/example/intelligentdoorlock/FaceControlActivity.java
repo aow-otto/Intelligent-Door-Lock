@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,7 @@ import java.util.Base64;
 import java.util.HashMap;
 
 public class FaceControlActivity extends AppCompatActivity {
+    private static final String TAG = "FaceControlActivity";
     private ListView listView;
     private ArrayAdapter<String> arrayAdapter;
 
@@ -63,7 +65,7 @@ public class FaceControlActivity extends AppCompatActivity {
 
     boolean deleteMode = false;
 
-    HashMap<String, String> account_face = new HashMap<String, String>();
+    HashMap<String, String> account_face = new HashMap<>();
     String rootPath = "/Intelligent_door_lock/";
     String facePath = rootPath + "Face/data/";
     String accountError = "操作失败，请检查API_key与API_secret是否匹配";
@@ -81,6 +83,7 @@ public class FaceControlActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         account_face = (HashMap<String, String>) intent.getSerializableExtra("data");
+        assert account_face != null;
         facePath += account_face.get("setName");
 
         layoutInflater = FaceControlActivity.this.getLayoutInflater();
@@ -104,9 +107,9 @@ public class FaceControlActivity extends AppCompatActivity {
                 view = layoutInflater.inflate(R.layout.face_add, null);
                 builder = new AlertDialog.Builder(FaceControlActivity.this);
                 dialog = builder.setView(view)
-                        .setPositiveButton("确定", (DialogInterface.OnClickListener) (dialog1, id) ->
+                        .setPositiveButton("确定", (dialog1, id) ->
                         {
-                            editText = (EditText) view.findViewById(R.id.FaceName);
+                            editText = view.findViewById(R.id.FaceName);
                             String[] faceNow = new File(facePath).list();
                             boolean faceExist = false;
                             if (faceNow != null) {
@@ -120,11 +123,7 @@ public class FaceControlActivity extends AppCompatActivity {
                             }
                             if (!faceExist) FaceAdd(editText.getText().toString());
                         })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        }).create();
+                        .setNegativeButton("取消", (dialog, id) -> dialog.dismiss()).create();
                 dialog.show();
                 break;
             case R.id.FaceRemove:
@@ -145,34 +144,24 @@ public class FaceControlActivity extends AppCompatActivity {
     public void FaceDisplay() {
         String[] faceNow = new File(facePath).list();
         if (faceNow == null) return;
-        listView = (ListView) findViewById(R.id.FaceList);
-        arrayAdapter = new ArrayAdapter<String>(this, R.layout.face_control, faceNow);
+        listView = findViewById(R.id.FaceList);
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.face_control, faceNow);
         listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!deleteMode) {
-                    String[] files = new File(facePath).list();
-                    imageView.setImageURI(Uri.fromFile(new File(facePath + '/' + files[0])));
-                } else {
-                    view = layoutInflater.inflate(R.layout.face_remove, null);
-                    textView = view.findViewById(R.id.FaceDeleteWarning);
-                    textView.setText("你确定要移除" + faceNow[position] + "吗？");
-                    dialog = builder.setView(view)
-                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    FaceRemove(facePath + '/' + faceNow[position]);
-                                    FaceDisplay();
-                                }
-                            })
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                }
-                            }).create();
-                    dialog.show();
-                }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (!deleteMode) {
+                String[] files = new File(facePath).list();
+                imageView.setImageURI(Uri.fromFile(new File(facePath + '/' + files[0])));
+            } else {
+                view = layoutInflater.inflate(R.layout.face_remove, null);
+                textView = view.findViewById(R.id.FaceDeleteWarning);
+                textView.setText("你确定要移除" + faceNow[position] + "吗？");
+                dialog = builder.setView(view)
+                        .setPositiveButton("确定", (dialog, id1) -> {
+                            FaceRemove(facePath + '/' + faceNow[position]);
+                            FaceDisplay();
+                        })
+                        .setNegativeButton("取消", (dialog, id12) -> dialog.dismiss()).create();
+                dialog.show();
             }
         });
     }
@@ -225,6 +214,7 @@ public class FaceControlActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         try {
+            assert in != null;
             data = new byte[in.available()];
         } catch (IOException e) {
             e.printStackTrace();
@@ -254,7 +244,7 @@ public class FaceControlActivity extends AppCompatActivity {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
             startActivityForResult(intent, 39);
         }
-        if (new File(savePath + "/stp.jpg").exists() == false) return "KamiiBaka";
+        if (!new File(savePath + "/stp.jpg").exists()) return "KamiiBaka";
         else return FaceDetect(savePath + "/stp.jpg");
     }
 
@@ -302,6 +292,7 @@ public class FaceControlActivity extends AppCompatActivity {
 
     public void FaceRemove(String faceName) {
         String[] image = new File(facePath + '/' + faceName).list();
+        assert image != null;
         image = image[0].split("\\.");
         JSONObject data = new JSONObject(), result;
         data.put("api_key", account_face.get("api_key"));

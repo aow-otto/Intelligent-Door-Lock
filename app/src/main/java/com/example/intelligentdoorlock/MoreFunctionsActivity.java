@@ -82,7 +82,7 @@ public class MoreFunctionsActivity extends AppCompatActivity {
                 });
 
                 dialog.setPositiveButton("取消定时关机", (dialog12, which) -> {
-                    if (((GlobalVarious) getApplication()).getAuto_control_close() != "") {
+                    if (!((GlobalVarious) getApplication()).getAuto_control_close().equals("")) {
                         AlertDialog.Builder dialog1 = new AlertDialog.Builder(MoreFunctionsActivity.this);
                         dialog1.setTitle("提示消息");
                         dialog1.setMessage("您确定要取消吗？");

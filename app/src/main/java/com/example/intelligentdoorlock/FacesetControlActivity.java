@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 
 
 public class FacesetControlActivity extends AppCompatActivity {
+    private static final String TAG = "FaceSetControl";
     private ListView listView;
     private ArrayAdapter<String> arrayAdapter;
 
@@ -96,33 +98,26 @@ public class FacesetControlActivity extends AppCompatActivity {
                 view = layoutInflater.inflate(R.layout.api_login, null);
                 builder = new AlertDialog.Builder(FacesetControlActivity.this);
                 dialog = builder.setView(view)
-                        .setPositiveButton("保存", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                editText = (EditText) view.findViewById(R.id.api_key);
-                                account_face.put("api_key", editText.getText().toString());
-                                editText = (EditText) view.findViewById(R.id.api_secret);
-                                account_face.put("api_secret", editText.getText().toString());
-                            }
+                        .setPositiveButton("保存", (dialog, id) -> {
+                            editText = view.findViewById(R.id.api_key);
+                            account_face.put("api_key", editText.getText().toString());
+                            editText = view.findViewById(R.id.api_secret);
+                            account_face.put("api_secret", editText.getText().toString());
                         })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        }).create();
+                        .setNegativeButton("取消", (dialog, id) -> dialog.dismiss()).create();
                 dialog.show();
-                editText = (EditText) dialog.findViewById(R.id.api_key);
+                editText = dialog.findViewById(R.id.api_key);
                 editText.setText(account_face.get("api_key"));
-                editText = (EditText) dialog.findViewById(R.id.api_secret);
+                editText = dialog.findViewById(R.id.api_secret);
                 editText.setText(account_face.get("api_secret"));
                 break;
             case R.id.FacesetCreate:
                 view = layoutInflater.inflate(R.layout.faceset_create, null);
                 builder = new AlertDialog.Builder(FacesetControlActivity.this);
                 dialog = builder.setView(view)
-                        .setPositiveButton("确定", (DialogInterface.OnClickListener) (dialog1, id) ->
+                        .setPositiveButton("确定", (dialog1, id) ->
                         {
-                            editText = (EditText) view.findViewById(R.id.FacesetName);
+                            editText = view.findViewById(R.id.FacesetName);
                             String[] facesetNow = new File(facesetPath).list();
                             boolean facesetExist = false;
                             if (facesetNow != null) {
@@ -135,15 +130,17 @@ public class FacesetControlActivity extends AppCompatActivity {
                                 }
                             }
                             if (!facesetExist) {
-                                FacesetCreate(editText.getText().toString());
+                                try {
+                                    FacesetCreate(editText.getText().toString());
+                                } catch (InterruptedException e) {
+                                    Toast.makeText(this, "创建失败", Toast.LENGTH_SHORT).show();
+                                }
+                                Log.d(TAG, "Arriving here -- after FaceSetCreate.");
                                 FacesetDisplay();
+                                Log.d(TAG, "Arriving here -- after FaceSetDisplay.");
                             }
                         })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        }).create();
+                        .setNegativeButton("取消", (dialog, id) -> dialog.dismiss()).create();
                 dialog.show();
                 break;
             case R.id.FacesetDelete:
@@ -164,36 +161,30 @@ public class FacesetControlActivity extends AppCompatActivity {
     public void FacesetDisplay() {
         String[] facesetNow = new File(facesetPath).list();
         if (facesetNow == null) return;
-        listView = (ListView) findViewById(R.id.FacesetList);
-        arrayAdapter = new ArrayAdapter<String>(this, R.layout.faceset_control, facesetNow);
+        listView = findViewById(R.id.FacesetList);
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.faceset_control, facesetNow);
         listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!deleteMode) {
-                    HashMap<String, String> data = account_face;
-                    data.put("setName", facesetNow[position]);
-                    Intent intent = new Intent(FacesetControlActivity.this, FaceControlActivity.class);
-                    intent.putExtra("data", (Serializable) data);
-                    FacesetControlActivity.this.startActivity(intent);
-                } else {
-                    textView = findViewById(R.id.FacesetDeleteWarning);
-                    textView.setText("你确定要删除" + facesetNow[position] + "吗？\n库中存储的人脸将被清空。");
-                    dialog = builder.setView(layoutInflater.inflate(R.layout.faceset_delete, null))
-                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    FacesetDelete(facesetPath + '/' + facesetNow[position]);
-                                    FacesetDisplay();
-                                }
-                            })
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                }
-                            }).create();
-                    dialog.show();
-                }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (!deleteMode) {
+                HashMap<String, String> data = account_face;
+                data.put("setName", facesetNow[position]);
+                Intent intent = new Intent(FacesetControlActivity.this, FaceControlActivity.class);
+                intent.putExtra("data", data);
+                FacesetControlActivity.this.startActivity(intent);
+            } else {
+                textView = findViewById(R.id.FacesetDeleteWarning);
+                textView.setText("你确定要删除" + facesetNow[position] + "吗？\n库中存储的人脸将被清空。");
+                dialog = builder.setView(layoutInflater.inflate(R.layout.faceset_delete, null))
+                        .setPositiveButton("确定", (dialog, id1) -> {
+                            try {
+                                FacesetDelete(facesetPath + '/' + facesetNow[position]);
+                            } catch (InterruptedException e) {
+                                Toast.makeText(this, "删除失败！", Toast.LENGTH_SHORT).show();
+                            }
+                            FacesetDisplay();
+                        })
+                        .setNegativeButton("取消", (dialog, id12) -> dialog.dismiss()).create();
+                dialog.show();
             }
         });
     }
@@ -212,23 +203,20 @@ public class FacesetControlActivity extends AppCompatActivity {
         fileNow.delete();
     }
 
-    public JSONObject SendPostUrl(String api_url, JSONObject data) {
+    public JSONObject SendPostUrl(String api_url, JSONObject data) throws InterruptedException {
         JSONObject[] result = new JSONObject[1];
         data.put("url", api_url);
         postRequest = new ApiTask();
         postRequest.execute(data);
-        postRequest.setOnAsyncResponse(new AsyncResponse() {
-            @Override
-            public void onDataReceivedSuccess(JSONObject dataReceived) {
-                result[0] = dataReceived;
-            }
-        });
         while (result[0] == null) {
+            Log.d(TAG, "SendPostUrl signal -- result[0]: " + result[0]);
+            postRequest.setOnAsyncResponse(dataReceived -> result[0] = dataReceived);
+            Thread.sleep(100);
         }
         return result[0];
     }
 
-    public void FacesetCreate(String setName) {
+    public void FacesetCreate(String setName) throws InterruptedException {
         JSONObject data = new JSONObject(), result;
         data.put("api_key", account_face.get("api_key"));
         data.put("api_secret", account_face.get("api_secret"));
@@ -236,11 +224,13 @@ public class FacesetControlActivity extends AppCompatActivity {
         data.put("check_empty", 0);
         data.put("url", "https://api-cn.faceplusplus.com/facepp/v3/faceset/create");
         result = SendPostUrl("https://api-cn.faceplusplus.com/facepp/v3/faceset/delete", data);
+        Log.d(TAG, "FaceSetCreate signal -- after SendPostUrl.");
+        if (result == null) return;
         if (result.containsKey("error_message")) PrintNotice(accountError);
         else new File(facesetPath + '/' + setName).mkdir();
     }
 
-    public void FacesetDelete(String setName) {
+    public void FacesetDelete(String setName) throws InterruptedException {
         JSONObject data = new JSONObject(), result;
         data.put("api_key", account_face.get("api_key"));
         data.put("api_secret", account_face.get("api_secret"));

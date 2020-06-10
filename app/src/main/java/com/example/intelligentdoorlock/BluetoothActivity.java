@@ -34,7 +34,6 @@ public class BluetoothActivity extends AppCompatActivity {
     private List<HashMap> blueList;
     private PairedBluetoothDialogAdapter pairedAdapter;
     private TextView textView;
-    public static BluetoothSocket socket;
     private ListView glvPaired;
     BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -53,60 +52,57 @@ public class BluetoothActivity extends AppCompatActivity {
             pairedAdapter = new PairedBluetoothDialogAdapter(this, blueList);
             pairedAdapter.notifyDataSetChanged();
             glvPaired.setAdapter(pairedAdapter);
-            glvPaired.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    BluetoothDevice gDevice = (BluetoothDevice) (((HashMap) pairedAdapter.getItem(position)).get("blue_device"));
-                    String id_matched = (String) (((HashMap) pairedAdapter.getItem(position)).get("blue_name"));
-                    Log.d(TAG, "想要连接的远程主机：" + gDevice);
-                    assert gDevice != null;
-                    Log.d(TAG, "想要连接的远程主机：" + gDevice.toString());
-                    SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-                    editor.putString("id_matched", id_matched);
-                    editor.putString("mac_address", gDevice.toString());
-                    editor.apply();
-                    //然后就可以连接或者做操作啦
+            glvPaired.setOnItemClickListener((parent, view, position, id) -> {
+                BluetoothDevice gDevice = (BluetoothDevice) (((HashMap) pairedAdapter.getItem(position)).get("blue_device"));
+                String id_matched = (String) (((HashMap) pairedAdapter.getItem(position)).get("blue_name"));
+                Log.d(TAG, "想要连接的远程主机：" + gDevice);
+                assert gDevice != null;
+                Log.d(TAG, "想要连接的远程主机：" + gDevice.toString());
+                SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
+                editor.putString("id_matched", id_matched);
+                editor.putString("mac_address", gDevice.toString());
+                editor.apply();
+                //然后就可以连接或者做操作啦
 
-                    BluetoothSocket socket = null;
+                BluetoothSocket socket = null;
+                try {
+                    // 蓝牙串口服务对应的UUID。如使用的是其它蓝牙服务，需更改下面的字符串
+                    UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+                    socket = gDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                } catch (Exception e) {
+                    Log.d("log", "获取Socket失败");
+                    Toast.makeText(BluetoothActivity.this, "连接失败！\n错误原因：获取Socket失败。", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                try {
+                    // Connect the device through the socket. This will block
+                    // until it succeeds or throws an exception
+                    textView.setText("正在连接中，请稍等……");
+                    socket.connect();
+                    Log.d("log", "连接成功");
+                    //连接成功即切回到之前的主页面
+                    Intent intent = new Intent(BluetoothActivity.this, MainActivity.class);
+                    intent.putExtra("id_matched", id_matched);
+                    intent.putExtra("mac_address", gDevice.toString());
+                    //将mBluetoothSocket装入Application全局变量，可以在其他Activity中获取到该socket
+                    ((GlobalVarious) getApplication()).setGlobalBlueSocket(socket);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                } catch (IOException connectException) {
+                    // Unable to connect; close the socket and get out
+                    Log.d("log", "连接失败");
+                    Toast.makeText(BluetoothActivity.this, "连接失败！\n请重新尝试，如实在无法连接，请到蓝牙配置界面手动连接。", Toast.LENGTH_SHORT).show();
                     try {
-                        // 蓝牙串口服务对应的UUID。如使用的是其它蓝牙服务，需更改下面的字符串
-                        UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-                        socket = gDevice.createRfcommSocketToServiceRecord(MY_UUID);
-                    } catch (Exception e) {
-                        Log.d("log", "获取Socket失败");
-                        Toast.makeText(BluetoothActivity.this, "连接失败！\n错误原因：获取Socket失败。", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    try {
-                        // Connect the device through the socket. This will block
-                        // until it succeeds or throws an exception
-                        textView.setText("正在连接中，请稍等……");
-                        socket.connect();
-                        Log.d("log", "连接成功");
-                        //连接成功即切回到之前的主页面
-                        Intent intent = new Intent(BluetoothActivity.this, MainActivity.class);
-                        intent.putExtra("id_matched", id_matched);
-                        intent.putExtra("mac_address", gDevice.toString());
-                        //将mBluetoothSocket装入Application全局变量，可以在其他Activity中获取到该socket
-                        ((GlobalVarious) getApplication()).setGlobalBlueSocket(socket);
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    } catch (IOException connectException) {
-                        // Unable to connect; close the socket and get out
-                        Log.d("log", "连接失败");
-                        Toast.makeText(BluetoothActivity.this, "连接失败！\n请重新尝试，如实在无法连接，请到蓝牙配置界面手动连接。", Toast.LENGTH_SHORT).show();
-                        try {
-                            socket.close();
-                            if (adapter != null) {
-                                initBlueTooth();
-                                pairedAdapter = new PairedBluetoothDialogAdapter(BluetoothActivity.this, blueList);
-                                pairedAdapter.notifyDataSetChanged();
-                                glvPaired.setAdapter(pairedAdapter);
-                            }
-                            textView.setText("请选择您要配对的设备");
-                        } catch (IOException ignored) {
-                            Toast.makeText(BluetoothActivity.this, "错误！\n关闭socket失败！", Toast.LENGTH_SHORT).show();
+                        socket.close();
+                        if (adapter != null) {
+                            initBlueTooth();
+                            pairedAdapter = new PairedBluetoothDialogAdapter(BluetoothActivity.this, blueList);
+                            pairedAdapter.notifyDataSetChanged();
+                            glvPaired.setAdapter(pairedAdapter);
                         }
+                        textView.setText("请选择您要配对的设备");
+                    } catch (IOException ignored) {
+                        Toast.makeText(BluetoothActivity.this, "错误！\n关闭socket失败！", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -114,12 +110,8 @@ public class BluetoothActivity extends AppCompatActivity {
 
         Button gotobluetooth = findViewById(R.id.gotobluetooth);
         if (adapter == null) gotobluetooth.setEnabled(false);
-        gotobluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
-            }
-        });
+        gotobluetooth.setOnClickListener(v ->
+                startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
     }
 
     @Override
@@ -146,7 +138,7 @@ public class BluetoothActivity extends AppCompatActivity {
             }
 
             Set<BluetoothDevice> devices = adapter.getBondedDevices();
-            blueList = new ArrayList<HashMap>();
+            blueList = new ArrayList<>();
             Log.d(TAG, "获取已经配对devices" + devices.size());
             for (BluetoothDevice bluetoothDevice : devices) {
                 Log.d(TAG, "已经配对的蓝牙设备：");

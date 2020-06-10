@@ -97,26 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    public void save(String inputText) {
-        FileOutputStream out = null;
-        BufferedWriter writer = null;
-        try {
-            out = openFileOutput("changeSettings", Context.MODE_PRIVATE);
-            writer = new BufferedWriter(new OutputStreamWriter(out));
-            writer.write(inputText);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -192,14 +172,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final ToggleButton toggleButton;
         toggleButton = findViewById(R.id.toggleButton);
+        toggleButton.setChecked(false);
         toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
                 Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
             } else {
                 if (isChecked) {
-                    //String inputText = "match " + id_matched + "\nsys_control open\nrequest_setting_file";
-                    //save(inputText);
-                    if (id_matched != null) {
+                    if (!id_matched.equals("")) {
                         try {
                             mmOutStream.write("sys_control open".getBytes());
                             ((GlobalVarious) getApplication()).setOpen_close("open");
@@ -208,11 +187,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
                             toggleButton.setChecked(false);
                         }
+                    } else {
+                        Toast.makeText(MainActivity.this, "请先配对装置！", Toast.LENGTH_SHORT).show();
+                        toggleButton.setChecked(false);
                     }
                 } else {
-                    if (id_matched != null) {
-                        //String inputText = "match " + id_matched + "\nsys_control close";
-                        //save(inputText);
+                    if (!id_matched.equals("")) {
                         try {
                             mmOutStream.write("sys_control close".getBytes());
                             ((GlobalVarious) getApplication()).setOpen_close("close");
@@ -221,13 +201,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "同步失败！", Toast.LENGTH_SHORT).show();
                             toggleButton.setChecked(true);
                         }
+                    } else {
+                        Toast.makeText(MainActivity.this, "请先配对装置！", Toast.LENGTH_SHORT).show();
+                        toggleButton.setChecked(false);
                     }
                 }
             }
         });
-
-        //实验代码：
-        //((GlobalVarious) getApplication()).setSafety_mode("2");
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -340,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             mac_address = "";
                             ((GlobalVarious) getApplication()).setGlobalBlueSocket(null);
                             ((GlobalVarious) getApplication()).setLatest_modified("");
+                            toggleButton.setChecked(false);
                             Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
                             startActivityForResult(intent, 1);
                         } catch (IOException ignored) {
@@ -670,8 +651,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 将选择器放在底部弹出框
-     *
-     * @param v
      */
     private void setAddressSelectorPopup(View v) {
         int screenHeight = getResources().getDisplayMetrics().heightPixels;
