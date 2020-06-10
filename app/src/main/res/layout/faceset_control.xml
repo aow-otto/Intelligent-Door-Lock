@@ -14,16 +14,16 @@
 
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_face_control"
+            android:id="@+id/toolbar_faceset_control"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#437CA8"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="39"
+            app:title="人脸识别库管理"
             app:titleTextColor="#FFFFFF" />
 
         <ListView
-            android:id="@+id/FaceList"
+            android:id="@+id/FacesetList"
             style="@style/Widget.AppCompat.ListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

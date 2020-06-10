@@ -29,6 +29,10 @@
             android:label="更多功能"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".FacesetControlActivity"
+            android:label="人脸识别设置"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".FaceControlActivity"
             android:label="人脸识别管理"
             android:theme="@style/AppTheme.NoActionBar" />

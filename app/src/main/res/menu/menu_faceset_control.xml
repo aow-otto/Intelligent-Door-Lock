@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="API设置" app:showAsAction="never" android:icon="@drawable/icon_update" android:id="@+id/APILogin"/>
+    <item android:title="新建人脸识别库" app:showAsAction="never" android:icon="@drawable/icon_help" android:id="@+id/FacesetCreate"/>
+    <item android:title="删除人脸识别库" app:showAsAction="never" android:icon="@drawable/icon_help" android:id="@+id/FacesetDelete"/>
+</menu>

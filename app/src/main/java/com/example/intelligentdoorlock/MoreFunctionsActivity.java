@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class MoreFunctionsActivity extends AppCompatActivity {
-    private OutputStream mmOutStream;
+    //private OutputStream mmOutStream;
     private long time;
     private static final int PERIOD = 19000;
 
@@ -28,22 +28,22 @@ public class MoreFunctionsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         time = intent.getLongExtra("time", 0);
 
-        try {
+        /*try {
             mmOutStream = (((GlobalVarious) getApplication()).getGlobalBlueSocket()).getOutputStream();
         } catch (IOException e) {
             Toast.makeText(this, "获取socket失败，请重试！", Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
         Button face_control = findViewById(R.id.face_control);
         face_control.setOnClickListener(v -> {
             if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
                 Toast.makeText(this, "正在开锁中，请稍后操作。", Toast.LENGTH_LONG).show();
             } else {
-                Intent intent1 = new Intent(MoreFunctionsActivity.this, FaceControlActivity.class);
+                Intent intent1 = new Intent(MoreFunctionsActivity.this, FacesetControlActivity.class);
                 startActivity(intent1);
             }
         });
-
+/*
         Button clear_auto_control = findViewById(R.id.clear_auto_control);
         clear_auto_control.setOnClickListener(v -> {
             if (System.currentTimeMillis() >= time && System.currentTimeMillis() <= time + PERIOD) {
@@ -106,7 +106,7 @@ public class MoreFunctionsActivity extends AppCompatActivity {
                 });
                 dialog.show();
             }
-        });
+        });*/
 
         Button indicator_light = findViewById(R.id.indicator_light);
         indicator_light.setOnClickListener(v -> {

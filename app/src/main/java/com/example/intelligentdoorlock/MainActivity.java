@@ -455,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Objects.equals(id_matched, "")) button5.setEnabled(false);
         button5.setOnClickListener(this::setAddressSelectorPopup2);
 
-        if (Objects.equals(id_matched, "")) button6.setEnabled(false);
+        //if (Objects.equals(id_matched, "")) button6.setEnabled(false);
         button6.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, MoreFunctionsActivity.class);
             intent.putExtra("time", time);
