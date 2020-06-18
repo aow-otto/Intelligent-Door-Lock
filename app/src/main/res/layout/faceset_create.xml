@@ -12,7 +12,7 @@
         android:contentDescription="@string/app_name"
         android:textSize="22sp"
         android:gravity="center"
-        android:text="创建人脸识别库"/>
+        android:text="创建人脸识别库（不能包含^@,&amp;=*&apos;&quot;等)"/>
 
     <EditText
         android:id="@+id/FacesetName"

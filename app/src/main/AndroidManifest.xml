@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.intelligentdoorlock">
 
+    <uses-sdk android:minSdkVersion="8"
+        tools:ignore="GradleOverrides" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:name=".GlobalVarious"
         android:allowBackup="true"
@@ -30,11 +35,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FacesetControlActivity"
-            android:label="人脸识别设置"
+            android:label="人脸识别管理"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FaceControlActivity"
-            android:label="人脸识别管理"
+            android:label="人脸管理"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".IndicatorLightActivity"
@@ -45,6 +50,9 @@
             android:label="关于我们"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <uses-permission
         android:name="android.permission.BLUETOOTH"
